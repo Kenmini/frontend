@@ -1,0 +1,229 @@
+import React from "react";
+
+interface DeviceDiagramProps {
+  dark: boolean;
+}
+
+export const DeviceDiagram: React.FC<DeviceDiagramProps> = ({ dark }) => {
+  const body = dark ? "#1b2733" : "#cfd8e0";
+  const bodyTop = dark ? "#243240" : "#dee5eb";
+  const panel = dark ? "#0f1922" : "#eef3f7";
+  const stroke = dark ? "#3a4d60" : "#aab6c2";
+  const knob = dark ? "#2d3e4e" : "#b7c3ce";
+  const screen = dark ? "#0c2b31" : "#bfe2e6";
+  const ink = dark ? "#52677a" : "#8595a4";
+
+  return (
+    <svg
+      viewBox="0 0 600 400"
+      preserveAspectRatio="none"
+      width="100%"
+      height="100%"
+      style={{
+        display: "block",
+        animation: "mediaFade .35s ease both",
+      }}
+    >
+      <rect key="bg" x={0} y={0} width={600} height={400} fill={panel} />
+      <line
+        key="desk"
+        x1={0}
+        y1={330}
+        x2={600}
+        y2={330}
+        stroke={stroke}
+        strokeWidth={2}
+        opacity={0.6}
+      />
+      <ellipse
+        key="sh"
+        cx={300}
+        cy={336}
+        rx={250}
+        ry={14}
+        fill="#000"
+        opacity={dark ? 0.35 : 0.08}
+      />
+      <rect
+        key="body"
+        x={60}
+        y={120}
+        width={480}
+        height={210}
+        rx={14}
+        fill={body}
+        stroke={stroke}
+        strokeWidth={2}
+      />
+      <rect
+        key="cover"
+        x={110}
+        y={80}
+        width={300}
+        height={180}
+        rx={12}
+        fill={bodyTop}
+        stroke={stroke}
+        strokeWidth={2}
+      />
+      <line
+        key="hinge"
+        x1={110}
+        y1={96}
+        x2={410}
+        y2={96}
+        stroke={stroke}
+        strokeWidth={1.5}
+        opacity={0.7}
+      />
+      <rect
+        key="win"
+        x={132}
+        y={112}
+        width={256}
+        height={70}
+        rx={6}
+        fill={screen}
+        opacity={0.55}
+      />
+      <rect
+        key="scr"
+        x={95}
+        y={150}
+        width={96}
+        height={64}
+        rx={5}
+        fill={screen}
+        stroke={stroke}
+        strokeWidth={1.5}
+      />
+      <line
+        key="sl1"
+        x1={105}
+        y1={168}
+        x2={178}
+        y2={168}
+        stroke={ink}
+        strokeWidth={3}
+        opacity={0.6}
+      />
+      <line
+        key="sl2"
+        x1={105}
+        y1={182}
+        x2={162}
+        y2={182}
+        stroke={ink}
+        strokeWidth={3}
+        opacity={0.45}
+      />
+      <line
+        key="sl3"
+        x1={105}
+        y1={196}
+        x2={170}
+        y2={196}
+        stroke={ink}
+        strokeWidth={3}
+        opacity={0.45}
+      />
+      <circle
+        key="dialo"
+        cx={251}
+        cy={241}
+        r={36}
+        fill={knob}
+        stroke={stroke}
+        strokeWidth={2}
+      />
+      <circle
+        key="diali"
+        cx={251}
+        cy={241}
+        r={24}
+        fill={panel}
+        opacity={0.5}
+      />
+      <line
+        key="dialp"
+        x1={251}
+        y1={241}
+        x2={251}
+        y2={220}
+        stroke={ink}
+        strokeWidth={4}
+        strokeLinecap="round"
+      />
+      <circle
+        key="keyo"
+        cx={340}
+        cy={290}
+        r={22}
+        fill={knob}
+        stroke={stroke}
+        strokeWidth={2}
+      />
+      <rect
+        key="keys"
+        x={337}
+        y={278}
+        width={6}
+        height={24}
+        rx={3}
+        fill={ink}
+      />
+      <rect
+        key="pwo"
+        x={452}
+        y={165}
+        width={46}
+        height={60}
+        rx={9}
+        fill={knob}
+        stroke={stroke}
+        strokeWidth={2}
+      />
+      <rect
+        key="pwi"
+        x={462}
+        y={173}
+        width={26}
+        height={22}
+        rx={5}
+        fill={dark ? "#1fb6c4" : "#0d7d8a"}
+      />
+      <rect
+        key="pwi2"
+        x={462}
+        y={199}
+        width={26}
+        height={18}
+        rx={5}
+        fill={ink}
+        opacity={0.4}
+      />
+      <rect
+        key="f1"
+        x={90}
+        y={330}
+        width={26}
+        height={12}
+        rx={3}
+        fill={knob}
+        stroke={stroke}
+        strokeWidth={1.5}
+      />
+      <rect
+        key="f2"
+        x={484}
+        y={330}
+        width={26}
+        height={12}
+        rx={3}
+        fill={knob}
+        stroke={stroke}
+        strokeWidth={1.5}
+      />
+    </svg>
+  );
+};
