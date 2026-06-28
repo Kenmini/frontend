@@ -11,6 +11,10 @@ export interface Step {
   title: string | { ja: string; en: string };
   text: string | { ja: string; en: string };
   annotation?: Annotation;
+  /** Human-readable name of the annotated item (e.g. "VACUUM STATE") */
+  annotationLabel?: string;
+  /** Explanation shown in the tooltip when the user clicks the annotation */
+  annotationDescription?: string;
   imageId?: string;
   imageUrl?: string;
 }

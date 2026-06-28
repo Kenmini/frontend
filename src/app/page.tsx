@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { ChatHistory } from "@/components/chat/ChatHistory";
 import { ChatInput } from "@/components/chat/ChatInput";
@@ -90,10 +90,39 @@ const CHAT_SUGGESTIONS = {
   en: ["The laser will not emit", "It will not power on", "Can't get it in focus"]
 };
 
+const subscribeToHydration = () => () => {};
+const getClientHydrationSnapshot = () => true;
+const getServerHydrationSnapshot = () => false;
+
+function getInitialLang(): "ja" | "en" {
+  if (typeof window === "undefined") return "ja";
+
+  const savedLang = localStorage.getItem("lang");
+  return savedLang === "en" ? "en" : "ja";
+}
+
+function getInitialDark() {
+  if (typeof window === "undefined") return false;
+
+  const savedTheme = localStorage.getItem("theme");
+  return savedTheme ? savedTheme === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+function getInitialEndpoint() {
+  if (typeof window === "undefined") return "";
+
+  return localStorage.getItem("api_endpoint") || "";
+}
+
 export default function Page() {
-  const [lang, setLang] = useState<"ja" | "en">("ja");
-  const [dark, setDark] = useState<boolean>(false);
-  const [endpoint, setEndpoint] = useState<string>("");
+  const mounted = useSyncExternalStore(
+    subscribeToHydration,
+    getClientHydrationSnapshot,
+    getServerHydrationSnapshot
+  );
+  const [lang, setLang] = useState<"ja" | "en">(getInitialLang);
+  const [dark, setDark] = useState<boolean>(getInitialDark);
+  const [endpoint, setEndpoint] = useState<string>(getInitialEndpoint);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [historyMenu, setHistoryMenu] = useState<{ item: string; x: number; y: number } | null>(null);
@@ -121,23 +150,7 @@ export default function Page() {
     errorMessage: t.error,
   });
 
-  useEffect(() => {
-    const timerId = window.setTimeout(() => {
-      const savedTheme = localStorage.getItem("theme");
-      const nextDark = savedTheme ? savedTheme === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setDark(nextDark);
 
-      const savedEndpoint = localStorage.getItem("api_endpoint") || "";
-      setEndpoint(savedEndpoint);
-
-      const savedLang = localStorage.getItem("lang");
-      if (savedLang === "en" || savedLang === "ja") {
-        setLang(savedLang);
-      }
-    }, 0);
-
-    return () => window.clearTimeout(timerId);
-  }, []);
 
   // Keep the root theme attribute in sync with the current UI setting.
   useEffect(() => {
@@ -185,6 +198,8 @@ export default function Page() {
       window.removeEventListener("keydown", closeMenu);
     };
   }, [historyMenu]);
+  // Return empty states before mounting to avoid SSR flash issues
+  if (!mounted) return null;
 
   return (
     <div

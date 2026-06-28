@@ -85,6 +85,8 @@ function adaptAskResponse(data: AskResponse): ChatResponse {
         text: highlight?.description || (item ? `${item}の位置を確認してください。` : "図面を確認してください。"),
         imageUrl: diagram.url,
         annotation: highlight?.annotation,
+        annotationLabel: highlight?.item,
+        annotationDescription: highlight?.description,
       });
     }
   }
@@ -124,7 +126,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Press [FUNCTION] on the left main panel and verify the conditions (V0: 200kV, Ratio: 5.5, I1: 30µA) are correct.",
         },
         imageUrl: "/images/diagrams/p4_フラッシュ.png",
-        annotation: { type: "highlight", x: 30, y: 30, width: 540, height: 340 }
+        annotation: { type: "highlight", x: 30, y: 30, width: 540, height: 340 },
+        annotationLabel: "左メインパネル全体",
+        annotationDescription: "左メインパネル内の[FUNCTION]を押して、高圧設定パラメータ（V0=200kV, Ratio=5.5, I1=30µA）を確認します。",
       },
       {
         id: "laser-s2",
@@ -134,7 +138,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Set the GV switch on the left main panel to OPEN.",
         },
         imageUrl: "/images/diagrams/p4_フラッシュ.png",
-        annotation: { type: "circle", x: 360, y: 290, width: 80, height: 80 }
+        annotation: { type: "circle", x: 360, y: 290, width: 80, height: 80 },
+        annotationLabel: "FE キー",
+        annotationDescription: "[FE]高圧電源ON/OFFトグルキー。GVをOPENにした後、このキーで高圧をONにします。",
       },
       {
         id: "laser-s3",
@@ -144,7 +150,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Press [FE], then press [FLASH] while it flashes to perform tip flushing (repeat until current reaches 0.4-0.7mA).",
         },
         imageUrl: "/images/diagrams/p4_フラッシュ.png",
-        annotation: { type: "circle", x: 270, y: 180, width: 80, height: 80 }
+        annotation: { type: "circle", x: 270, y: 180, width: 80, height: 80 },
+        annotationLabel: "FLASH ボタン",
+        annotationDescription: "[FLASH]ボタン。ランプ点滅中に押してフラッシングパルスを印加します。フラッシング電流が0.4〜0.7mAに達するまで繰り返します。",
       },
       {
         id: "laser-s4",
@@ -154,7 +162,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "After high voltage ramps up, wait 40 minutes. Then press [I1C] on the left main panel to auto-set the emission current.",
         },
         imageUrl: "/images/diagrams/p4_フラッシュ.png",
-        annotation: { type: "circle", x: 440, y: 180, width: 80, height: 80 }
+        annotation: { type: "circle", x: 440, y: 180, width: 80, height: 80 },
+        annotationLabel: "I1C ボタン",
+        annotationDescription: "[I1C]ボタン。昇圧から40分待機後、このボタンを押してエミッション電流の自動制御を完了させます。",
       }
     ]
   },
@@ -173,7 +183,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Place the specimen on the holder tip and mount the specimen clamping ring with its wide side facing up.",
         },
         imageUrl: "/images/diagrams/p3_試料ホルダー.png",
-        annotation: { type: "highlight", x: 100, y: 50, width: 400, height: 280 }
+        annotation: { type: "highlight", x: 100, y: 50, width: 400, height: 280 },
+        annotationLabel: "試料押さえ",
+        annotationDescription: "碗状の試料押さえ。広口が上になるようにセットし、ネジ山を潰さないよう強く締めすぎないようにします。",
       },
       {
         id: "holder-s2",
@@ -183,7 +195,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Align the guide groove, insert the holder straight to position A, and switch the exhaust toggle to 'EVAC' while holding it (wait ~120s).",
         },
         imageUrl: "/images/diagrams/p3_試料ホルダー_A位置.png",
-        annotation: { type: "highlight", x: 180, y: 80, width: 240, height: 160 }
+        annotation: { type: "highlight", x: 180, y: 80, width: 240, height: 160 },
+        annotationLabel: "A位置（約5cm）",
+        annotationDescription: "シリンダの溝を合わせ、一番手前のA位置（約5cm）までまっすぐ差し込みます。その後EVACスイッチを押します。",
       },
       {
         id: "holder-s3",
@@ -193,7 +207,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "When the pre-evacuation buzzer sounds, insert the holder while rotating it 45 degrees clockwise until it stops (intermediate Position B).",
         },
         imageUrl: "/images/diagrams/p3_試料ホルダー_B位置.png",
-        annotation: { type: "highlight", x: 220, y: 150, width: 180, height: 120 }
+        annotation: { type: "highlight", x: 220, y: 150, width: 180, height: 120 },
+        annotationLabel: "B位置（約25cm）",
+        annotationDescription: "排気完了後ブザーが鳴る15秒の間に、時計方向に45度回して止まるまで挿入した中間位置（B位置・約25cm）。",
       },
       {
         id: "holder-s4",
@@ -203,7 +219,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Rotate it 15 degrees counter-clockwise and gently push all the way in until it stops (observation Position C).",
         },
         imageUrl: "/images/diagrams/p3_試料ホルダー_図.png",
-        annotation: { type: "circle", x: 160, y: 160, width: 60, height: 60 }
+        annotation: { type: "circle", x: 160, y: 160, width: 60, height: 60 },
+        annotationLabel: "C位置",
+        annotationDescription: "反時計回りに15度戻して観察位置まで完全に押し込んだ状態。これが通常の観察位置です。",
       }
     ]
   },
@@ -222,7 +240,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Insert the objective aperture (normally No. 2) so that the central transmitted beam is selected.",
         },
         imageUrl: "/images/diagrams/p2_初期状態確認_鏡筒状態確認横.png",
-        annotation: { type: "highlight", x: 430, y: 250, width: 140, height: 60 }
+        annotation: { type: "highlight", x: 430, y: 250, width: 140, height: 60 },
+        annotationLabel: "対物絞り",
+        annotationDescription: "対物レンズ絞りレバー。回折パターンを得た後、透過波が中心になるように対物絞り（通常2番）を挿入します。",
       },
       {
         id: "focus-s2",
@@ -232,7 +252,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Adjust focus to overfocus, and use OBJ STIGM-XY on the left sub-panel to make the outer fringe width equal in all directions.",
         },
         imageUrl: "/images/diagrams/p7_非点収差補正_粒状構造.png",
-        annotation: { type: "highlight", x: 50, y: 50, width: 500, height: 300 }
+        annotation: { type: "highlight", x: 50, y: 50, width: 500, height: 300 },
+        annotationLabel: "フリンジパターン比較",
+        annotationDescription: "左：補正済みの等方的フリンジ（目標）。右：非点ありの横縞フリンジ（要補正）。OBJ STIGM-XYで左の状態に追い込みます。",
       },
       {
         id: "focus-s3",
@@ -242,7 +264,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Finely adjust the focus to the point of minimum contrast (exact focus) where the amorphous grain features look finest and sharpest.",
         },
         imageUrl: "/images/diagrams/p6_試料の位置調整_実際のビュー.png",
-        annotation: { type: "highlight", x: 50, y: 50, width: 500, height: 300 }
+        annotation: { type: "highlight", x: 50, y: 50, width: 500, height: 300 },
+        annotationLabel: "正焦点像",
+        annotationDescription: "Z軸を上下させて像の輪郭コントラストが最小になる点が正焦点高さです。WOBBLERをONにして像の揺れが止まる点を探す方法もあります。",
       }
     ]
   },
@@ -261,7 +285,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Condense the beam, and if it is not centered on the screen, use BRIGHTNESS CENTERING on the right main panel to align it.",
         },
         imageUrl: "/images/diagrams/p6_明度調整.png",
-        annotation: { type: "highlight", x: 150, y: 100, width: 300, height: 200 }
+        annotation: { type: "highlight", x: 150, y: 100, width: 300, height: 200 },
+        annotationLabel: "BRIGHTNESS CENTERING",
+        annotationDescription: "ビームを絞ったときに中心位置にアライメントするBRIGHTNESS CENTERINGつまみ。大きいビームと小さいビームが同じ中心を向くよう調整します。",
       },
       {
         id: "astig-s2",
@@ -271,7 +297,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Use COND STIGM-TEM(3rd) on the left sub-panel to make the caustic shadow symmetric when condensing the beam.",
         },
         imageUrl: "/images/diagrams/p5_非点補正_3rd.png",
-        annotation: { type: "highlight", x: 120, y: 80, width: 360, height: 240 }
+        annotation: { type: "highlight", x: 120, y: 80, width: 360, height: 240 },
+        annotationLabel: "COND STIGM-TEM (3rd)",
+        annotationDescription: "左サブパネルのCOND STIGM-TEM（3rd）つまみ。絞り込み時のビームの対称性（カウスチック）を補正します。手裏剣形が対称になるよう調整します。",
       },
       {
         id: "astig-s3",
@@ -281,7 +309,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Use COND STIGM(2nd) on the right sub-panel to condense the spot into the smallest possible perfect circle.",
         },
         imageUrl: "/images/diagrams/p5_非点補正_2nd.png",
-        annotation: { type: "highlight", x: 120, y: 80, width: 360, height: 240 }
+        annotation: { type: "highlight", x: 120, y: 80, width: 360, height: 240 },
+        annotationLabel: "COND STIGM (2nd)",
+        annotationDescription: "右サブパネルのCOND STIGM（2nd）つまみ。ビームスポットをきれいな正円形に補正します。丸い星形になるよう追い込みます。",
       }
     ]
   },
@@ -299,7 +329,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Ensure the VACUUM STATE lamps on the right main panel are normal (GUN flashes green, other 3 light green).",
         },
         imageUrl: "/images/diagrams/p2_初期状態確認_右メインパネル.png",
-        annotation: { type: "circle", x: 310, y: 110, width: 180, height: 100 }
+        annotation: { type: "circle", x: 310, y: 110, width: 180, height: 100 },
+        annotationLabel: "VACUUM STATE",
+        annotationDescription: "右メインパネル上部の真空ステータス表示。通常時はGUNランプ点滅、他の3つが常時点灯していることを確認します。",
       },
       {
         id: "default-s2",
@@ -309,7 +341,9 @@ const SCENARIOS: Record<string, ChatResponse> = {
           en: "Make sure that the condenser aperture, objective aperture, and SAD aperture are retracted for startup.",
         },
         imageUrl: "/images/diagrams/p2_初期状態確認_鏡筒状態確認横.png",
-        annotation: { type: "highlight", x: 430, y: 60, width: 140, height: 320 }
+        annotation: { type: "highlight", x: 430, y: 60, width: 140, height: 320 },
+        annotationLabel: "各種絞りレバー",
+        annotationDescription: "収束レンズ絞り・X線分析用絞り・対物絞り・制限視野絞りの各レバー。起動時はすべて抜かれていることを確認します。",
       }
     ]
   }
