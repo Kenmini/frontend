@@ -1,25 +1,12 @@
-export interface Annotation {
-  type: "circle" | "highlight" | "arrow";
-  x: number; // coordinate out of 600 width
-  y: number; // coordinate out of 400 height
-  width: number;
-  height: number;
-}
+import type { ChatRequestOptions, ChatResponse, Citation, VisualData } from "@/types/chat";
 
-export interface Step {
-  id: string;
-  title: string | { ja: string; en: string };
-  text: string | { ja: string; en: string };
-  annotation?: Annotation;
-  imageId?: string;
-  imageUrl?: string;
-}
-
-export interface ChatResponse {
-  answer: string | { ja: string; en: string };
-  steps: Step[];
-  warnings?: string[] | string;
-  slackContext?: string;
+interface AskResponse {
+  answer_text: string;
+  next_step_hint?: string | null;
+  visual_data: VisualData | null;
+  citations: Citation[];
+  confidence: number;
+  is_gap: boolean;
 }
 
 // -------------------------------------------------------------
@@ -30,6 +17,62 @@ export const FORCE_MOCK_MODE = process.env.NEXT_PUBLIC_USE_MOCK === "true";
 
 // Default backend API endpoint from environment variables (wired at build/runtime time).
 export const DEFAULT_API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT || "";
+const REQUEST_TIMEOUT_MS = 15000;
+const DEFAULT_FIGURE_ID = "panel_01";
+let cachedSessionId: string | null = null;
+
+function resolveAskEndpoint(endpoint: string) {
+  const trimmed = endpoint.trim();
+  if (trimmed.endsWith("/ask")) return trimmed;
+  return `${trimmed.replace(/\/$/, "")}/ask`;
+}
+
+function getSessionId() {
+  if (cachedSessionId) return cachedSessionId;
+
+  if (typeof window === "undefined") {
+    cachedSessionId = "frontend-server-session";
+    return cachedSessionId;
+  }
+
+  const saved = window.localStorage.getItem("chat_session_id");
+  if (saved) {
+    cachedSessionId = saved;
+    return cachedSessionId;
+  }
+
+  const generated =
+    typeof window.crypto?.randomUUID === "function"
+      ? window.crypto.randomUUID()
+      : `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  window.localStorage.setItem("chat_session_id", generated);
+  cachedSessionId = generated;
+  return generated;
+}
+
+function isAskResponse(value: unknown): value is AskResponse {
+  if (!value || typeof value !== "object") return false;
+  const data = value as Partial<AskResponse>;
+  return (
+    typeof data.answer_text === "string" &&
+    Array.isArray(data.citations) &&
+    typeof data.confidence === "number" &&
+    typeof data.is_gap === "boolean"
+  );
+}
+
+function adaptAskResponse(data: AskResponse): ChatResponse {
+  return {
+    answer: data.answer_text,
+    steps: [],
+    warnings: data.is_gap ? "資料に回答が見つからなかったため、この質問は先生確認用に記録されました。" : undefined,
+    nextStepHint: data.next_step_hint,
+    citations: data.citations,
+    confidence: data.confidence,
+    isGap: data.is_gap,
+    visualData: data.visual_data,
+  };
+}
 
 // -------------------------------------------------------------
 // MOCK DATA SCENARIOS (Japanese default, English translation included)
@@ -194,9 +237,14 @@ const SCENARIOS: Record<string, ChatResponse> = {
  * 
  * @param message The natural language text input by the student
  * @param endpoint Optional backend API URL (POST request)
+ * @param options Optional backend request state such as session and active figure
  * @returns Promise Resolves to ChatResponse containing answer, steps, and optional metadata
  */
-export async function sendChatMessage(message: string, endpoint?: string): Promise<ChatResponse> {
+export async function sendChatMessage(
+  message: string,
+  endpoint?: string,
+  options: ChatRequestOptions = {},
+): Promise<ChatResponse> {
   // Use user-provided endpoint first, fallback to DEFAULT_API_ENDPOINT
   const activeEndpoint = endpoint?.trim() || DEFAULT_API_ENDPOINT.trim();
 
@@ -235,14 +283,21 @@ export async function sendChatMessage(message: string, endpoint?: string): Promi
     return SCENARIOS.default;
   }
 
-  // Actual API Call
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
   try {
-    const response = await fetch(activeEndpoint, {
+    const response = await fetch(resolveAskEndpoint(activeEndpoint), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({
+        message,
+        session_id: options.sessionId ?? getSessionId(),
+        current_state: { active_figure_id: options.activeFigureId ?? DEFAULT_FIGURE_ID },
+      }),
+      signal: controller.signal,
     });
 
     if (!response.ok) {
@@ -250,14 +305,17 @@ export async function sendChatMessage(message: string, endpoint?: string): Promi
     }
 
     const data = await response.json();
-    return {
-      answer: data.answer || "",
-      steps: data.steps || [],
-      warnings: data.warnings,
-      slackContext: data.slackContext,
-    };
-  } catch (error: any) {
+    if (!isAskResponse(data)) {
+      throw new Error("Invalid API response shape");
+    }
+    return adaptAskResponse(data);
+  } catch (error: unknown) {
     console.error("Backend API connection failed:", error);
-    throw new Error(error.message || "API Connection Error");
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error("API request timed out");
+    }
+    throw new Error(error instanceof Error ? error.message : "API Connection Error");
+  } finally {
+    window.clearTimeout(timeoutId);
   }
 }
