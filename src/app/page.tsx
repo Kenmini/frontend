@@ -187,7 +187,9 @@ export default function Page() {
   // Bypass boot screen in test automation environments to avoid delaying test suites.
   useEffect(() => {
     if (typeof navigator !== "undefined" && navigator.webdriver) {
-      setBooting(false);
+      setTimeout(() => {
+        setBooting(false);
+      }, 0);
     }
   }, []);
 
