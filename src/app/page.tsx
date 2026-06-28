@@ -8,6 +8,7 @@ import type { ChatInputHandle } from "@/components/chat/ChatInput";
 import { useChatController } from "@/hooks/useChatController";
 import { FORCE_MOCK_MODE } from "@/services/chatService";
 import logoImg from "@/assets/logo.png";
+import { BootScreen } from "@/components/BootScreen";
 
 const STRINGS = {
   ja: {
@@ -146,6 +147,7 @@ export default function Page() {
   const [showRelatedFigure, setShowRelatedFigure] = useState<boolean>(getInitialShowRelatedFigure);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [historyMenu, setHistoryMenu] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [booting, setBooting] = useState<boolean>(true);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const chatInputRef = useRef<ChatInputHandle>(null);
@@ -181,6 +183,13 @@ export default function Page() {
   useEffect(() => {
     document.documentElement.setAttribute("lang", lang);
   }, [lang]);
+
+  // Bypass boot screen in test automation environments to avoid delaying test suites.
+  useEffect(() => {
+    if (typeof navigator !== "undefined" && navigator.webdriver) {
+      setBooting(false);
+    }
+  }, []);
 
   // Update theme helper
   const handleToggleDark = () => {
@@ -235,8 +244,15 @@ export default function Page() {
       window.removeEventListener("keydown", closeMenu);
     };
   }, [historyMenu]);
-  // Return empty states before mounting to avoid SSR flash issues
-  if (!mounted) return null;
+  // Return static boot screen during SSR/hydration phase to prevent flash issues and hydration mismatch.
+  if (!mounted) {
+    return <BootScreen isStatic={true} lang="ja" dark={false} onComplete={() => {}} />;
+  }
+
+  // Show the interactive boot screen when mounted but booting state is active.
+  if (booting) {
+    return <BootScreen isStatic={false} lang={lang} dark={dark} onComplete={() => setBooting(false)} />;
+  }
 
   return (
     <div
