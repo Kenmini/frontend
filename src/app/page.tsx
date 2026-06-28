@@ -121,6 +121,7 @@ export default function Page() {
   const [endpoint, setEndpoint] = useState<string>(getInitialEndpoint);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [historyMenu, setHistoryMenu] = useState<{ item: string; x: number; y: number } | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const chatInputRef = useRef<ChatInputHandle>(null);
@@ -179,6 +180,19 @@ export default function Page() {
     }
   }, [messages, loading, error]);
 
+  useEffect(() => {
+    if (!historyMenu) return;
+
+    const closeMenu = () => setHistoryMenu(null);
+    window.addEventListener("click", closeMenu);
+    window.addEventListener("keydown", closeMenu);
+
+    return () => {
+      window.removeEventListener("click", closeMenu);
+      window.removeEventListener("keydown", closeMenu);
+    };
+  }, [historyMenu]);
+
   // Return empty states before mounting to avoid SSR flash issues
   if (!mounted) return null;
 
@@ -206,6 +220,64 @@ export default function Page() {
           }}
           className="mobile-overlay"
         />
+      )}
+
+      {historyMenu && (
+        <div
+          style={{
+            position: "fixed",
+            top: historyMenu.y,
+            left: historyMenu.x,
+            zIndex: 200,
+            minWidth: "132px",
+            padding: "5px",
+            border: "1px solid var(--border)",
+            borderRadius: "8px",
+            backgroundColor: "var(--surface)",
+            boxShadow: "var(--shadow)",
+          }}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <button
+            onClick={() => {
+              deleteHistoryItem(historyMenu.item);
+              setHistoryMenu(null);
+            }}
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              border: "none",
+              backgroundColor: "transparent",
+              color: "var(--text)",
+              cursor: "pointer",
+              padding: "8px 9px",
+              borderRadius: "6px",
+              fontSize: "12.5px",
+              textAlign: "left",
+            }}
+            className="sidebar-item-hover"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 6h18" />
+              <path d="M8 6V4h8v2" />
+              <path d="M19 6l-1 14H6L5 6" />
+              <path d="M10 11v5" />
+              <path d="M14 11v5" />
+            </svg>
+            {lang === "ja" ? "削除" : "Delete"}
+          </button>
+        </div>
       )}
 
       {/* Sidebar Component */}
@@ -349,6 +421,10 @@ export default function Page() {
                 {historyItems.map((item, idx) => (
                   <div
                     key={idx}
+                    onContextMenu={(event) => {
+                      event.preventDefault();
+                      setHistoryMenu({ item, x: event.clientX, y: event.clientY });
+                    }}
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -404,42 +480,6 @@ export default function Page() {
                       >
                         {item}
                       </span>
-                    </button>
-                    <button
-                      onClick={() => deleteHistoryItem(item)}
-                      title={lang === "ja" ? "履歴から削除" : "Delete from history"}
-                      style={{
-                        width: "28px",
-                        height: "28px",
-                        flexShrink: 0,
-                        border: "none",
-                        backgroundColor: "transparent",
-                        color: "var(--muted)",
-                        cursor: "pointer",
-                        borderRadius: "7px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: "4px",
-                      }}
-                      className="sidebar-item-hover"
-                    >
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M3 6h18" />
-                        <path d="M8 6V4h8v2" />
-                        <path d="M19 6l-1 14H6L5 6" />
-                        <path d="M10 11v5" />
-                        <path d="M14 11v5" />
-                      </svg>
                     </button>
                   </div>
                 ))}
