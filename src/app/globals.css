@@ -252,6 +252,56 @@ textarea {
   gap: 4px;
 }
 
+.answer-rich-text-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background-color: var(--surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin: 6px 0;
+}
+
+.answer-rich-text table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.answer-rich-text th {
+  font-weight: 700;
+  background-color: var(--surface2);
+  color: var(--text);
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.answer-rich-text td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.answer-rich-text tr:last-child td {
+  border-bottom: none;
+}
+
+.answer-rich-text tr {
+  transition: background-color 0.2s ease;
+}
+
+.answer-rich-text tr:nth-child(even) {
+  background-color: var(--surface2);
+}
+
+.answer-rich-text tr:hover {
+  background-color: var(--hover);
+}
+
 .answer-rich-text hr {
   width: 100%;
   border: 0;

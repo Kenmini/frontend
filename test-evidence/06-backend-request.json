@@ -1,7 +1,8 @@
 {
   "message": "輝度つまみはどこですか？",
-  "session_id": "cf410805-cf3a-4ac4-b23b-95d567b5b6d0",
+  "session_id": "3e8259d0-c4ef-42b5-a3b4-f7eaa78da131",
   "current_state": {
     "active_figure_id": "panel_01"
-  }
+  },
+  "lang": "ja"
 }

@@ -83,6 +83,41 @@ function FormattedAnswerText({ text }: { text: string }) {
           );
         }
 
+        if (block.type === "table") {
+          return (
+            <div key={index} className="answer-rich-text-table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    {block.headers.map((header, headerIndex) => {
+                      const alignment = block.alignments?.[headerIndex] || "left";
+                      return (
+                        <th key={headerIndex} style={{ textAlign: alignment }}>
+                          {renderInlineText(header)}
+                        </th>
+                      );
+                    })}
+                  </tr>
+                </thead>
+                <tbody>
+                  {block.rows.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {row.map((cell, cellIndex) => {
+                        const alignment = block.alignments?.[cellIndex] || "left";
+                        return (
+                          <td key={cellIndex} style={{ textAlign: alignment }}>
+                            {renderInlineText(cell)}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+
         return <p key={index}>{renderInlineText(block.text)}</p>;
       })}
     </div>

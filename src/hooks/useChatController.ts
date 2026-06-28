@@ -250,13 +250,15 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
         const next = { ...prev, [msgId]: nextIdx };
 
         if (currentConversationId) {
-          updateStoredConversations((stored) =>
-            stored.map((conv) =>
-              conv.id === currentConversationId
-                ? { ...conv, stepIndex: next, updatedAt: Date.now() }
-                : conv,
-            ),
-          );
+          setTimeout(() => {
+            updateStoredConversations((stored) =>
+              stored.map((conv) =>
+                conv.id === currentConversationId
+                  ? { ...conv, stepIndex: next, updatedAt: Date.now() }
+                  : conv,
+              ),
+            );
+          }, 0);
         }
 
         return next;
