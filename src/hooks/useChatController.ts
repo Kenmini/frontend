@@ -7,11 +7,19 @@ import type { ChatMessage, ChatResponse, Step } from "@/types/chat";
 type Language = "ja" | "en";
 const HISTORY_STORAGE_KEY = "chat_history";
 const HISTORY_CHANGED_EVENT = "chat_history_changed";
-const MAX_HISTORY_ENTRIES = 15;
+const MAX_CONVERSATIONS = 15;
 
-interface HistoryEntry {
-  query: string;
-  aiMessage?: ChatMessage;
+interface Conversation {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  stepIndex: Record<string, number>;
+  updatedAt: number;
+}
+
+export interface HistoryItem {
+  id: string;
+  title: string;
 }
 
 interface UseChatControllerOptions {
@@ -28,7 +36,7 @@ function pickLocalizedText(value: string | { ja: string; en: string }, lang: Lan
   return value;
 }
 
-function createMessageId(prefix: string) {
+function createId(prefix: string) {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return `${prefix}-${crypto.randomUUID()}`;
   }
@@ -36,35 +44,73 @@ function createMessageId(prefix: string) {
   return `${prefix}-${Math.random().toString(36).slice(2)}`;
 }
 
-function loadHistoryEntries(): HistoryEntry[] {
+function loadConversations(): Conversation[] {
   if (typeof window === "undefined") return [];
 
-  return parseHistoryEntries(window.localStorage.getItem(HISTORY_STORAGE_KEY));
+  return parseConversations(window.localStorage.getItem(HISTORY_STORAGE_KEY));
 }
 
-function parseHistoryEntries(savedHistory: string | null): HistoryEntry[] {
-  if (!savedHistory) return [];
+function parseConversations(saved: string | null): Conversation[] {
+  if (!saved) return [];
   try {
-    const parsed = JSON.parse(savedHistory);
+    const parsed = JSON.parse(saved);
     if (!Array.isArray(parsed)) return [];
 
     return parsed
-      .map((item): HistoryEntry | null => {
+      .map((item): Conversation | null => {
+        // Legacy format: plain query string
         if (typeof item === "string") {
-          return { query: item };
-        }
-        if (item && typeof item === "object" && typeof item.query === "string") {
           return {
-            query: item.query,
-            aiMessage:
-              item.aiMessage && typeof item.aiMessage === "object"
-                ? (item.aiMessage as ChatMessage)
-                : undefined,
+            id: createId("conv"),
+            title: item,
+            messages: [{ id: createId("u"), role: "user", text: item }],
+            stepIndex: {},
+            updatedAt: 0,
           };
         }
+        if (!item || typeof item !== "object") return null;
+
+        // Conversation format (new)
+        if (
+          typeof item.id === "string" &&
+          typeof item.title === "string" &&
+          Array.isArray(item.messages)
+        ) {
+          return {
+            id: item.id,
+            title: item.title,
+            messages: item.messages as ChatMessage[],
+            stepIndex:
+              item.stepIndex && typeof item.stepIndex === "object"
+                ? (item.stepIndex as Record<string, number>)
+                : {},
+            updatedAt: typeof item.updatedAt === "number" ? item.updatedAt : 0,
+          };
+        }
+
+        // Legacy format: { query, aiMessage? }
+        if (typeof item.query === "string") {
+          const userMsg: ChatMessage = {
+            id: createId("u"),
+            role: "user",
+            text: item.query,
+          };
+          const messages: ChatMessage[] = [userMsg];
+          if (item.aiMessage && typeof item.aiMessage === "object") {
+            messages.push(item.aiMessage as ChatMessage);
+          }
+          return {
+            id: createId("conv"),
+            title: item.query,
+            messages,
+            stepIndex: {},
+            updatedAt: 0,
+          };
+        }
+
         return null;
       })
-      .filter((entry): entry is HistoryEntry => entry !== null);
+      .filter((c): c is Conversation => c !== null);
   } catch (err) {
     console.error(err);
   }
@@ -89,8 +135,8 @@ function subscribeHistoryItems(onStoreChange: () => void) {
   };
 }
 
-function updateStoredHistoryEntries(updater: (prev: HistoryEntry[]) => HistoryEntry[]) {
-  const updated = updater(loadHistoryEntries());
+function updateStoredConversations(updater: (prev: Conversation[]) => Conversation[]) {
+  const updated = updater(loadConversations());
   window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updated));
   window.dispatchEvent(new Event(HISTORY_CHANGED_EVENT));
 }
@@ -101,15 +147,20 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [stepIndex, setStepIndex] = useState<Record<string, number>>({});
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const historySnapshot = useSyncExternalStore(subscribeHistoryItems, getHistorySnapshot, () => "[]");
-  const historyEntries = useMemo(() => parseHistoryEntries(historySnapshot), [historySnapshot]);
-  const historyItems = useMemo(() => historyEntries.map((entry) => entry.query), [historyEntries]);
+  const conversations = useMemo(() => parseConversations(historySnapshot), [historySnapshot]);
+  const historyItems = useMemo<HistoryItem[]>(
+    () => conversations.map((c) => ({ id: c.id, title: c.title })),
+    [conversations],
+  );
 
   const handleNewChat = useCallback(() => {
     setMessages([]);
     setStepIndex({});
     setError(null);
     setInput("");
+    setCurrentConversationId(null);
   }, []);
 
   const handleSend = useCallback(
@@ -118,26 +169,24 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
       if (!textToSend || loading) return;
 
       const userMessage: ChatMessage = {
-        id: createMessageId("u"),
+        id: createId("u"),
         role: "user",
         text: textToSend,
       };
+
+      const targetId = currentConversationId ?? createId("conv");
+      if (!currentConversationId) {
+        setCurrentConversationId(targetId);
+      }
 
       setMessages((prev) => [...prev, userMessage]);
       setInput("");
       setLoading(true);
       setError(null);
 
-      updateStoredHistoryEntries((prev) =>
-        [{ query: textToSend }, ...prev.filter((entry) => entry.query !== textToSend)].slice(
-          0,
-          MAX_HISTORY_ENTRIES,
-        ),
-      );
-
       try {
         const response: ChatResponse = await sendChatMessage(textToSend, endpoint, { lang });
-        const aiMsgId = createMessageId("ai");
+        const aiMsgId = createId("ai");
         const steps: Step[] = response.steps.map((step, idx) => ({
           ...step,
           id: step.id || `${aiMsgId}-step-${idx}`,
@@ -159,11 +208,19 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
         setMessages((prev) => [...prev, aiMessage]);
         setStepIndex((prev) => ({ ...prev, [aiMsgId]: 0 }));
 
-        updateStoredHistoryEntries((prev) =>
-          prev.map((entry) =>
-            entry.query === textToSend ? { ...entry, aiMessage } : entry,
-          ),
-        );
+        updateStoredConversations((prev) => {
+          const existing = prev.find((c) => c.id === targetId);
+          const others = prev.filter((c) => c.id !== targetId);
+          const baseMessages = existing?.messages ?? [];
+          const updated: Conversation = {
+            id: targetId,
+            title: existing?.title ?? textToSend,
+            messages: [...baseMessages, userMessage, aiMessage],
+            stepIndex: { ...(existing?.stepIndex ?? {}), [aiMsgId]: 0 },
+            updatedAt: Date.now(),
+          };
+          return [updated, ...others].slice(0, MAX_CONVERSATIONS);
+        });
       } catch (err: unknown) {
         const detail = err instanceof Error ? err.message : String(err);
         setError(`${errorMessage} (${detail})`);
@@ -171,45 +228,54 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
         setLoading(false);
       }
     },
-    [endpoint, errorMessage, input, lang, loading]
+    [currentConversationId, endpoint, errorMessage, input, lang, loading],
   );
 
-  const selectHistoryItem = useCallback(
-    (query: string) => {
-      const cached = loadHistoryEntries().find((entry) => entry.query === query);
+  const selectConversation = useCallback((id: string) => {
+    const conv = loadConversations().find((c) => c.id === id);
+    if (!conv) return;
 
-      if (!cached?.aiMessage) {
-        handleSend(query);
-        return;
-      }
+    setMessages(conv.messages);
+    setStepIndex(conv.stepIndex);
+    setCurrentConversationId(id);
+    setError(null);
+    setInput("");
+  }, []);
 
-      const userMessage: ChatMessage = {
-        id: createMessageId("u"),
-        role: "user",
-        text: query,
-      };
+  const handleStepNavigation = useCallback(
+    (msgId: string, delta: number, totalSteps: number) => {
+      setStepIndex((prev) => {
+        const currentIdx = prev[msgId] ?? 0;
+        const nextIdx = Math.max(0, Math.min(totalSteps - 1, currentIdx + delta));
+        const next = { ...prev, [msgId]: nextIdx };
 
-      const aiMessage = { ...cached.aiMessage, id: createMessageId("ai") };
+        if (currentConversationId) {
+          updateStoredConversations((stored) =>
+            stored.map((conv) =>
+              conv.id === currentConversationId
+                ? { ...conv, stepIndex: next, updatedAt: Date.now() }
+                : conv,
+            ),
+          );
+        }
 
-      setMessages([userMessage, aiMessage]);
-      setStepIndex({ [aiMessage.id]: 0 });
-      setError(null);
-      setInput("");
+        return next;
+      });
     },
-    [handleSend],
+    [currentConversationId],
   );
 
-  const handleStepNavigation = useCallback((msgId: string, delta: number, totalSteps: number) => {
-    setStepIndex((prev) => {
-      const currentIdx = prev[msgId] ?? 0;
-      const nextIdx = Math.max(0, Math.min(totalSteps - 1, currentIdx + delta));
-      return { ...prev, [msgId]: nextIdx };
-    });
-  }, []);
-
-  const deleteHistoryItem = useCallback((itemToDelete: string) => {
-    updateStoredHistoryEntries((prev) => prev.filter((entry) => entry.query !== itemToDelete));
-  }, []);
+  const deleteConversation = useCallback(
+    (id: string) => {
+      updateStoredConversations((prev) => prev.filter((conv) => conv.id !== id));
+      if (currentConversationId === id) {
+        setMessages([]);
+        setStepIndex({});
+        setCurrentConversationId(null);
+      }
+    },
+    [currentConversationId],
+  );
 
   return {
     input,
@@ -218,12 +284,13 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
     error,
     stepIndex,
     historyItems,
+    currentConversationId,
     setInput,
     clearError: () => setError(null),
     handleNewChat,
     handleSend,
-    selectHistoryItem,
+    selectConversation,
     handleStepNavigation,
-    deleteHistoryItem,
+    deleteConversation,
   };
 }

@@ -145,7 +145,7 @@ export default function Page() {
   const [showConfidence, setShowConfidence] = useState<boolean>(getInitialShowConfidence);
   const [showRelatedFigure, setShowRelatedFigure] = useState<boolean>(getInitialShowRelatedFigure);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-  const [historyMenu, setHistoryMenu] = useState<{ item: string; x: number; y: number } | null>(null);
+  const [historyMenu, setHistoryMenu] = useState<{ id: string; x: number; y: number } | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const chatInputRef = useRef<ChatInputHandle>(null);
@@ -162,9 +162,9 @@ export default function Page() {
     clearError,
     handleNewChat,
     handleSend,
-    selectHistoryItem,
+    selectConversation,
     handleStepNavigation,
-    deleteHistoryItem,
+    deleteConversation,
   } = useChatController({
     endpoint,
     lang,
@@ -282,7 +282,7 @@ export default function Page() {
         >
           <button
             onClick={() => {
-              deleteHistoryItem(historyMenu.item);
+              deleteConversation(historyMenu.id);
               setHistoryMenu(null);
             }}
             style={{
@@ -460,12 +460,12 @@ export default function Page() {
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                {historyItems.map((item, idx) => (
+                {historyItems.map((item) => (
                   <div
-                    key={idx}
+                    key={item.id}
                     onContextMenu={(event) => {
                       event.preventDefault();
-                      setHistoryMenu({ item, x: event.clientX, y: event.clientY });
+                      setHistoryMenu({ id: item.id, x: event.clientX, y: event.clientY });
                     }}
                     style={{
                       display: "flex",
@@ -480,7 +480,7 @@ export default function Page() {
                   >
                     <button
                       onClick={() => {
-                        selectHistoryItem(item);
+                        selectConversation(item.id);
                         setSidebarOpen(false);
                       }}
                       style={{
@@ -520,7 +520,7 @@ export default function Page() {
                           textOverflow: "ellipsis",
                         }}
                       >
-                        {item}
+                        {item.title}
                       </span>
                     </button>
                   </div>
