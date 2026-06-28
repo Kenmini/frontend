@@ -1,0 +1,570 @@
+{
+  "p2_初期状態確認_右メインパネル": {
+    "filename": "p2_初期状態確認_右メインパネル.png",
+    "name": "Page 2 - 初期状態確認 (右メインパネル)",
+    "description": "初期状態確認時の右メインパネル画像。真空インジケータ（VACUUM STATE）や照明スイッチを配置。",
+    "highlights": {
+      "VACUUM STATE": {
+        "item": "VACUUM STATE",
+        "annotation": {
+          "type": "circle",
+          "x": 310,
+          "y": 110,
+          "width": 180,
+          "height": 100
+        },
+        "explanation": "右メインパネル上部の真空ステータス表示。通常時はGUNランプ点滅、他3つが常時点灯していることを確認します。"
+      },
+      "PANEL LAMP": {
+        "item": "PANEL LAMP",
+        "annotation": {
+          "type": "circle",
+          "x": 460,
+          "y": 220,
+          "width": 60,
+          "height": 60
+        },
+        "explanation": "メインパネル操作ダイヤル部のバックライト照明スイッチ。"
+      },
+      "ROOM LAMP": {
+        "item": "ROOM LAMP",
+        "annotation": {
+          "type": "circle",
+          "x": 580,
+          "y": 220,
+          "width": 60,
+          "height": 60
+        },
+        "explanation": "顕微鏡室の照明制御スイッチ。"
+      }
+    }
+  },
+  "p2_初期状態確認_鏡筒状態確認横": {
+    "filename": "p2_初期状態確認_鏡筒状態確認横.png",
+    "name": "Page 2 - 鏡筒各部絞り確認 (横レイアウト)",
+    "description": "顕微鏡鏡筒の中央部レバー位置。各種レンズ絞りや検出器の抜き差し状態を示します（横配置）。",
+    "highlights": {
+      "収束レンズ絞り": {
+        "item": "収束レンズ絞り",
+        "annotation": {
+          "type": "highlight",
+          "x": 430,
+          "y": 60,
+          "width": 140,
+          "height": 60
+        },
+        "explanation": "収束レンズ（コンデンサー）絞りレバー。起動時はレバーが抜かれていることを確認します。"
+      },
+      "X線分析用絞り": {
+        "item": "X線分析用絞り",
+        "annotation": {
+          "type": "highlight",
+          "x": 430,
+          "y": 155,
+          "width": 140,
+          "height": 60
+        },
+        "explanation": "EDX分析時に使用するX線用絞りレバー。右側に倒れている（抜かれている）ことを確認します。"
+      },
+      "対物絞り": {
+        "item": "対物絞り",
+        "annotation": {
+          "type": "highlight",
+          "x": 430,
+          "y": 250,
+          "width": 140,
+          "height": 60
+        },
+        "explanation": "対物レンズ絞りレバー。起動時に抜かれていることを確認します。"
+      },
+      "制限視野絞り": {
+        "item": "制限視野絞り",
+        "annotation": {
+          "type": "highlight",
+          "x": 430,
+          "y": 320,
+          "width": 140,
+          "height": 60
+        },
+        "explanation": "制限視野回折（SAD）絞りレバー。起動時に抜かれていることを確認します。"
+      }
+    }
+  },
+  "p2_初期状態確認_鏡筒状態確認縦": {
+    "filename": "p2_初期状態確認_鏡筒状態確認縦.png",
+    "name": "Page 2 - 鏡筒各部絞り確認 (縦レイアウト)",
+    "description": "顕微鏡鏡筒の中央部レバー位置。各種レンズ絞りや検出器の抜き差し状態を示します（縦配置）。",
+    "highlights": {
+      "収束レンズ絞り": {
+        "item": "収束レンズ絞り",
+        "annotation": {
+          "type": "highlight",
+          "x": 450,
+          "y": 60,
+          "width": 120,
+          "height": 60
+        },
+        "explanation": "収束レンズ絞りレバー。起動時は抜かれていることを確認します。"
+      },
+      "対物絞り": {
+        "item": "対物絞り",
+        "annotation": {
+          "type": "highlight",
+          "x": 450,
+          "y": 250,
+          "width": 120,
+          "height": 60
+        },
+        "explanation": "対物レンズ絞りレバー。起動時に抜かれていることを確認します。"
+      }
+    }
+  },
+  "p3_試料ホルダー": {
+    "filename": "p3_試料ホルダー.png",
+    "name": "Page 3 - 試料ホルダーのセット",
+    "description": "試料ホルダー先端にカーボン等のサンプルを載せる際の位置固定図。",
+    "highlights": {
+      "試料押さえ": {
+        "item": "試料押さえ",
+        "annotation": {
+          "type": "highlight",
+          "x": 100,
+          "y": 50,
+          "width": 400,
+          "height": 280
+        },
+        "explanation": "二軸傾斜ホルダーの試料押さえ固定部。広口を上にセットし、ネジ山を潰さないよう強く締めすぎないようにします。"
+      }
+    }
+  },
+  "p3_試料ホルダー_A位置": {
+    "filename": "p3_試料ホルダー_A位置.png",
+    "name": "Page 3 - 試料ホルダーの挿入準備 (A位置)",
+    "description": "試料ホルダーを予備排気チャンバーのガイド溝に沿って挿入し、EVACを開始する状態。",
+    "highlights": {
+      "A位置": {
+        "item": "A位置",
+        "annotation": {
+          "type": "highlight",
+          "x": 180,
+          "y": 80,
+          "width": 240,
+          "height": 160
+        },
+        "explanation": "シリンダの溝を合わせ、一番手前のA位置までまっすぐ差し込みます。"
+      },
+      "排気スイッチ": {
+        "item": "排気スイッチ",
+        "annotation": {
+          "type": "highlight",
+          "x": 40,
+          "y": 240,
+          "width": 120,
+          "height": 120
+        },
+        "explanation": "ホルダーを軽く指で押し込みながら、試料室排気スイッチを『EVAC』に切り替えます。"
+      }
+    }
+  },
+  "p3_試料ホルダー_B位置": {
+    "filename": "p3_試料ホルダー_B位置.png",
+    "name": "Page 3 - 中間挿入 (B位置)",
+    "description": "予備排気（約120秒）完了後にアラームが鳴る中、時計回りに回転させて挿入する様子。",
+    "highlights": {
+      "B位置": {
+        "item": "B位置",
+        "annotation": {
+          "type": "highlight",
+          "x": 220,
+          "y": 150,
+          "width": 180,
+          "height": 120
+        },
+        "explanation": "排気完了後ブザーが鳴る15秒の間に、時計方向に45°回して止まるまで挿入した中間位置（B位置）。"
+      }
+    }
+  },
+  "p3_試料ホルダー_図": {
+    "filename": "p3_試料ホルダー_図.png",
+    "name": "Page 3 - 試料ホルダー回転角度模式図",
+    "description": "ホルダーを真空を保ちながら挿入するための回転ステップ模式図。",
+    "highlights": {
+      "A位置": {
+        "item": "A位置",
+        "annotation": {
+          "type": "circle",
+          "x": 300,
+          "y": 230,
+          "width": 60,
+          "height": 60
+        },
+        "explanation": "挿入開始および予備排気・大気リーク時の基準位置。"
+      },
+      "B位置": {
+        "item": "B位置",
+        "annotation": {
+          "type": "circle",
+          "x": 270,
+          "y": 120,
+          "width": 60,
+          "height": 60
+        },
+        "explanation": "時計回りに45°回転させて中間ロックされた位置。"
+      },
+      "C位置": {
+        "item": "C位置",
+        "annotation": {
+          "type": "circle",
+          "x": 160,
+          "y": 160,
+          "width": 60,
+          "height": 60
+        },
+        "explanation": "反時計回りに15°戻して観察位置まで完全に押し込んだ状態。"
+      }
+    }
+  },
+  "p4_フラッシュ": {
+    "filename": "p4_フラッシュ.png",
+    "name": "Page 4 - 左メインパネル (フラッシング操作)",
+    "description": "高圧印加およびタングステンチップのクリーニング（フラッシング）を制御するパネル領域。",
+    "highlights": {
+      "FLASH": {
+        "item": "FLASH",
+        "annotation": {
+          "type": "circle",
+          "x": 270,
+          "y": 180,
+          "width": 80,
+          "height": 80
+        },
+        "explanation": "[FLASH]ボタン。ランプ点滅中に押してフラッシングパルスを印加します（0.4〜0.7mA目標）。"
+      },
+      "I1C": {
+        "item": "I1C",
+        "annotation": {
+          "type": "circle",
+          "x": 440,
+          "y": 180,
+          "width": 80,
+          "height": 80
+        },
+        "explanation": "[I1C]ボタン。昇圧から40分待機後、エミッション電流の自動制御を完了させるために使用します。"
+      },
+      "FE": {
+        "item": "FE",
+        "annotation": {
+          "type": "circle",
+          "x": 360,
+          "y": 290,
+          "width": 80,
+          "height": 80
+        },
+        "explanation": "[FE]高圧電源ON/OFFトグルキー。"
+      }
+    }
+  },
+  "p5_非点補正_2nd": {
+    "filename": "p5_非点補正_2nd.png",
+    "name": "Page 5 - 2次収束非点補正 (右サブパネル)",
+    "description": "収束レンズ（コンデンサー）スポットを円形に成形するための2次非点つまみ位置。",
+    "highlights": {
+      "COND STIGM": {
+        "item": "COND STIGM",
+        "annotation": {
+          "type": "highlight",
+          "x": 120,
+          "y": 80,
+          "width": 360,
+          "height": 240
+        },
+        "explanation": "右サブパネルのCOND STIGM(2nd)つまみ。ビームスポットをきれいな正円形に補正します。"
+      }
+    }
+  },
+  "p5_非点補正_3rd": {
+    "filename": "p5_非点補正_3rd.png",
+    "name": "Page 5 - 3次収束非点補正 (左サブパネル)",
+    "description": "ビームを絞り込むときのカウスチック対称性を微調整する3次非点つまみ位置。",
+    "highlights": {
+      "COND STIGM-TEM": {
+        "item": "COND STIGM-TEM",
+        "annotation": {
+          "type": "highlight",
+          "x": 120,
+          "y": 80,
+          "width": 360,
+          "height": 240
+        },
+        "explanation": "左サブパネルのCOND STIGM-TEM(3rd)つまみ。絞り込み時のビームの対称性（カウスチック）を補正します。"
+      }
+    }
+  },
+  "p5_非点補正_実際のビュー": {
+    "filename": "p5_非点補正_実際のビュー.png",
+    "name": "Page 5 - 非点カウスチック形状",
+    "description": "非点収差調整中に蛍光板上に投影されるビームの星形陰影（カウスチック）。",
+    "highlights": {
+      "カウスチック": {
+        "item": "カウスチック",
+        "annotation": {
+          "type": "highlight",
+          "x": 370,
+          "y": 50,
+          "width": 210,
+          "height": 300
+        },
+        "explanation": "3次非点を合わせる際、手裏剣形に見えるカウスチック模様。これを完全な点対称（手裏剣の羽が対称）に追い込みます。"
+      }
+    }
+  },
+  "p6_明度調整": {
+    "filename": "p6_明度調整.png",
+    "name": "Page 6 - 輝度中心調整 (Brightness Centering)",
+    "description": "ビーム収束時の輝度スポットが蛍光板の中央にくるように調整するつまみ。",
+    "highlights": {
+      "BRIGHTNESS CENTERING": {
+        "item": "BRIGHTNESS CENTERING",
+        "annotation": {
+          "type": "highlight",
+          "x": 150,
+          "y": 100,
+          "width": 300,
+          "height": 200
+        },
+        "explanation": "右メインパネルのBRIGHTNESS CENTERINGつまみ。ビームを絞ったときに中心位置にアライメントします。"
+      }
+    }
+  },
+  "p6_試料の位置調整": {
+    "filename": "p6_試料の位置調整.png",
+    "name": "Page 6 - Z軸ステージコントロールつまみ",
+    "description": "対物レンズ電流（焦点位置）と試料の高さを物理的に合わせる（Z軸調整）ダイヤルスイッチ。",
+    "highlights": {
+      "Zコントロール": {
+        "item": "Zコントロール",
+        "annotation": {
+          "type": "highlight",
+          "x": 200,
+          "y": 150,
+          "width": 200,
+          "height": 200
+        },
+        "explanation": "対物レンズの基準電流（OBJ: 5.72付近）に対し、試料の高さを物理的に上下させて正焦点に合わせるZコントロールノブ。"
+      }
+    }
+  },
+  "p6_試料の位置調整_実際のビュー": {
+    "filename": "p6_試料の位置調整_実際のビュー.png",
+    "name": "Page 6 - 像の正焦点コントラスト変化",
+    "description": "フォーカス調整時におけるアモルファスやエッジ像の見え方（最小コントラスト）。",
+    "highlights": {
+      "像": {
+        "item": "像",
+        "annotation": {
+          "type": "highlight",
+          "x": 50,
+          "y": 50,
+          "width": 500,
+          "height": 300
+        },
+        "explanation": "Z軸を上下させて像の輪郭コントラストが最小になる点（またはWOBBLER動作時に像の揺れが止まる点）が試料の正焦点高さです。"
+      }
+    }
+  },
+  "p7_非点収差補正": {
+    "filename": "p7_非点収差補正.png",
+    "name": "Page 7 - 対物非点補正ダイヤル (OBJ STIGM)",
+    "description": "高倍率時のぼやけを解消するための対物レンズ非点（OBJ STIGM-XY）ダイヤル配置。",
+    "highlights": {
+      "RESET": {
+        "item": "RESET",
+        "annotation": {
+          "type": "circle",
+          "x": 250,
+          "y": 190,
+          "width": 100,
+          "height": 100
+        },
+        "explanation": "対物レンズ非点補正回路の基準リセットスイッチ。150K倍以下での観察では通常リセット状態で問題ありません。"
+      },
+      "OBJ STIGM": {
+        "item": "OBJ STIGM",
+        "annotation": {
+          "type": "highlight",
+          "x": 150,
+          "y": 80,
+          "width": 300,
+          "height": 150
+        },
+        "explanation": "OBJ STIGM-XYダイヤル。200K倍以上での観察時、アモルファスのフリンジを等方的に調整する際に使用します。"
+      }
+    }
+  },
+  "p7_非点収差補正_粒状構造": {
+    "filename": "p7_非点収差補正_粒状構造.png",
+    "name": "Page 7 - アモルファス薄膜フリンジパターン",
+    "description": "対物非点を補正する際に基準とするカーボン薄膜のアモルファスフリンジ構造図。",
+    "highlights": {
+      "フリンジ": {
+        "item": "フリンジ",
+        "annotation": {
+          "type": "highlight",
+          "x": 50,
+          "y": 50,
+          "width": 500,
+          "height": 300
+        },
+        "explanation": "過焦点（オーバーフォーカス）状態でフリンジ（白黒の干渉フチ）の幅が、円の全周（縦横斜め）で等しく対称になるようにOBJ STIGMダイヤルで追い込みます。"
+      }
+    }
+  },
+  "p8_明視野法": {
+    "filename": "p8_明視野法.png",
+    "name": "Page 8 - 透過波選択と明視野・格子像モード図",
+    "description": "回折図形上で絞りを選択することによって、明視野像（BF像）と格子干渉像（HR-TEM像）を切り替える原理図。",
+    "highlights": {
+      "電子回折図形": {
+        "item": "電子回折図形",
+        "annotation": {
+          "type": "highlight",
+          "x": 100,
+          "y": 150,
+          "width": 160,
+          "height": 120
+        },
+        "explanation": "回折波（結晶面からの反射）ドットが集まった電子回折図形。"
+      },
+      "明視野像": {
+        "item": "明視野像",
+        "annotation": {
+          "type": "highlight",
+          "x": 320,
+          "y": 80,
+          "width": 180,
+          "height": 120
+        },
+        "explanation": "中心の透過波のみを選択し（他を絞りでカット）、コントラストを得る通常の顕微鏡像（明視野像）。"
+      },
+      "格子像": {
+        "item": "格子像",
+        "annotation": {
+          "type": "highlight",
+          "x": 320,
+          "y": 220,
+          "width": 180,
+          "height": 120
+        },
+        "explanation": "複数の回折斑点および透過波を干渉させて、結晶格子配列の規則線（フリンジ）を捉える格子像。"
+      }
+    }
+  },
+  "p10_beamtilt1": {
+    "filename": "p10_beamtilt1.png",
+    "name": "Page 10 - BEAM TILT 調整キー",
+    "description": "電圧中心調整やビームコマフリー補正の際に使用する傾斜調整キー配置。",
+    "highlights": {
+      "ALIGNMENT": {
+        "item": "ALIGNMENT",
+        "annotation": {
+          "type": "highlight",
+          "x": 100,
+          "y": 100,
+          "width": 400,
+          "height": 200
+        },
+        "explanation": "左サブパネルにあるBTX, BTVX, BTY, BTVY方向キー。Wobbler動作中に像がブレないようにアライメントします。"
+      }
+    }
+  },
+  "p10_beamtilt2": {
+    "filename": "p10_beamtilt2.png",
+    "name": "Page 10 - Wobbler振動アライメント軌跡",
+    "description": "アライメントがズレている時のビームの楕円軌道から、正しく調整された往復直線軌道への変化模式図。",
+    "highlights": {
+      "軌道": {
+        "item": "軌道",
+        "annotation": {
+          "type": "highlight",
+          "x": 150,
+          "y": 100,
+          "width": 300,
+          "height": 200
+        },
+        "explanation": "ビームが振動した際の明るさ逃げ。楕円に広がってしまう軌跡を、一軸上の純粋な直線振動になるよう補正します。"
+      }
+    }
+  },
+  "p10_試料傾斜1": {
+    "filename": "p10_試料傾斜1.png",
+    "name": "Page 10 - 二軸傾斜ホルダー用コネクタ接続",
+    "description": "ステージ前面のホルダー接続ソケット部。試料傾斜角度を制御するためのケーブル配線位置。",
+    "highlights": {
+      "コネクタ": {
+        "item": "コネクタ",
+        "annotation": {
+          "type": "highlight",
+          "x": 200,
+          "y": 100,
+          "width": 200,
+          "height": 200
+        },
+        "explanation": "二軸ホルダー挿入後、傾斜コントロールケーブルのプラグを顕微鏡前面のソケットに慎重に差し込みます。"
+      }
+    }
+  },
+  "p10_試料傾斜2": {
+    "filename": "p10_試料傾斜2.png",
+    "name": "Page 10 - 傾斜コントローラ（二軸傾斜装置）",
+    "description": "結晶方位を調整するための二軸傾斜装置（TILT CONTROLLER）電源パネル。",
+    "highlights": {
+      "電源スイッチ": {
+        "item": "電源スイッチ",
+        "annotation": {
+          "type": "circle",
+          "x": 100,
+          "y": 150,
+          "width": 80,
+          "height": 80
+        },
+        "explanation": "二軸傾斜用電源ユニットのPOWERスイッチをONにします。"
+      }
+    }
+  },
+  "p11_マイクロディフラクション": {
+    "filename": "p11_マイクロディフラクション.png",
+    "name": "Page 11 - マイクロディフラクションアライメント",
+    "description": "微小領域回折（μ-SAD）でスポット中心を蛍光板中心に一致させる手順図。",
+    "highlights": {
+      "調整": {
+        "item": "調整",
+        "annotation": {
+          "type": "highlight",
+          "x": 100,
+          "y": 100,
+          "width": 400,
+          "height": 200
+        },
+        "explanation": "DIFFモード選択時、回折斑点の透過ビームが蛍光板のクロスヘア中心に来るように、左サブパネルのINT ALIGNを用いてアライメントします。"
+      }
+    }
+  },
+  "p12_試料交換": {
+    "filename": "p12_試料交換.png",
+    "name": "Page 12 - 試料ホルダー取り出し注意マーク",
+    "description": "鏡筒真空を破らずにホルダーを安全に取り出す（大気リーク順序）警告指示図。",
+    "highlights": {
+      "警告": {
+        "item": "警告",
+        "annotation": {
+          "type": "highlight",
+          "x": 150,
+          "y": 100,
+          "width": 300,
+          "height": 200
+        },
+        "explanation": "重大な警告：試料交換室排気スイッチを『AIR』にし、右パネルの『SPEC AIR』赤ランプが点灯することを確認する前に、ホルダーをA位置から引き抜かないでください。"
+      }
+    }
+  }
+}
