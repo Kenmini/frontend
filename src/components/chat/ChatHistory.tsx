@@ -40,39 +40,6 @@ interface ChatHistoryProps {
   onClearError: () => void;
 }
 
-function AiHeader({ label }: { label: string }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "7px",
-        color: "var(--muted)",
-        fontSize: "11px",
-        fontWeight: 600,
-        letterSpacing: ".04em",
-      }}
-    >
-      <span
-        style={{
-          width: "18px",
-          height: "18px",
-          borderRadius: "5px",
-          backgroundColor: "var(--primary)",
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--primary-ink)" strokeWidth="2.4">
-          <path d="M5 13l4 4L19 7" />
-        </svg>
-      </span>
-      {label}
-    </div>
-  );
-}
-
 export function ChatHistory({
   messages,
   loading,

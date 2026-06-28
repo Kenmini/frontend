@@ -71,6 +71,7 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function Ch
           value={value}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
+          disabled={loading}
           rows={1}
           placeholder={placeholder}
           style={{
