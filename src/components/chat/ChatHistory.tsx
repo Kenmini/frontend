@@ -33,6 +33,8 @@ interface ChatHistoryProps {
   stepIndex: Record<string, number>;
   dark: boolean;
   lang: "ja" | "en";
+  showConfidence: boolean;
+  showRelatedFigure: boolean;
   labels: ChatHistoryLabels;
   scrollRef: React.RefObject<HTMLDivElement | null>;
   onSuggestionClick: (text: string) => void;
@@ -48,6 +50,8 @@ export function ChatHistory({
   stepIndex,
   dark,
   lang,
+  showConfidence,
+  showRelatedFigure,
   labels,
   scrollRef,
   onSuggestionClick,
@@ -175,6 +179,8 @@ export function ChatHistory({
                     citations={message.citations}
                     confidence={message.confidence}
                     visualData={message.visualData}
+                    showConfidence={showConfidence}
+                    showRelatedFigure={showRelatedFigure}
                     labels={{
                       aiName: labels.aiName,
                       warnings: labels.warnings,

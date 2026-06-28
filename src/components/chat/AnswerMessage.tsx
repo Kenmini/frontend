@@ -23,6 +23,8 @@ interface AnswerMessageProps {
   citations?: Citation[];
   confidence?: number;
   visualData?: VisualData | null;
+  showConfidence?: boolean;
+  showRelatedFigure?: boolean;
   labels: AnswerMessageLabels;
 }
 
@@ -95,12 +97,16 @@ export function AnswerMessage({
   citations,
   confidence,
   visualData,
+  showConfidence = false,
+  showRelatedFigure = false,
   labels,
 }: AnswerMessageProps) {
   const [pdfExpanded, setPdfExpanded] = useState(false);
   const hasCitations = citations && citations.length > 0;
-  const hasVisualData = Boolean(visualData?.figure_id || visualData?.highlight_item);
-  const hasMetadata = nextStepHint || typeof confidence === "number" || hasVisualData || hasCitations;
+  const hasVisualData =
+    showRelatedFigure && Boolean(visualData?.figure_id || visualData?.highlight_item);
+  const confidenceVisible = showConfidence && typeof confidence === "number";
+  const hasMetadata = nextStepHint || confidenceVisible || hasVisualData || hasCitations;
   // Show PDF fallback only when there are no static images but a pdf_url exists
   const hasStaticImages = (visualData?.static_images?.length ?? 0) > 0;
   const hasPdfFallback = !hasStaticImages && Boolean(visualData?.pdf_url) && Boolean(visualData?.page_number);
@@ -256,10 +262,10 @@ export function AnswerMessage({
             lineHeight: 1.45,
           }}
         >
-          {typeof confidence === "number" && (
+          {confidenceVisible && (
             <div>
               <strong>{labels.confidence}: </strong>
-              {Math.round(confidence * 100)}%
+              {Math.round(confidence! * 100)}%
             </div>
           )}
           {nextStepHint && (

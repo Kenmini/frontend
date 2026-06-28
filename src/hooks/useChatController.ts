@@ -7,6 +7,12 @@ import type { ChatMessage, ChatResponse, Step } from "@/types/chat";
 type Language = "ja" | "en";
 const HISTORY_STORAGE_KEY = "chat_history";
 const HISTORY_CHANGED_EVENT = "chat_history_changed";
+const MAX_HISTORY_ENTRIES = 15;
+
+interface HistoryEntry {
+  query: string;
+  aiMessage?: ChatMessage;
+}
 
 interface UseChatControllerOptions {
   endpoint: string;
@@ -30,19 +36,35 @@ function createMessageId(prefix: string) {
   return `${prefix}-${Math.random().toString(36).slice(2)}`;
 }
 
-function loadHistoryItems() {
+function loadHistoryEntries(): HistoryEntry[] {
   if (typeof window === "undefined") return [];
 
-  return parseHistoryItems(window.localStorage.getItem(HISTORY_STORAGE_KEY));
+  return parseHistoryEntries(window.localStorage.getItem(HISTORY_STORAGE_KEY));
 }
 
-function parseHistoryItems(savedHistory: string | null) {
+function parseHistoryEntries(savedHistory: string | null): HistoryEntry[] {
   if (!savedHistory) return [];
   try {
-    const parsedHistory = JSON.parse(savedHistory);
-    if (Array.isArray(parsedHistory)) {
-      return parsedHistory.filter((item): item is string => typeof item === "string");
-    }
+    const parsed = JSON.parse(savedHistory);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .map((item): HistoryEntry | null => {
+        if (typeof item === "string") {
+          return { query: item };
+        }
+        if (item && typeof item === "object" && typeof item.query === "string") {
+          return {
+            query: item.query,
+            aiMessage:
+              item.aiMessage && typeof item.aiMessage === "object"
+                ? (item.aiMessage as ChatMessage)
+                : undefined,
+          };
+        }
+        return null;
+      })
+      .filter((entry): entry is HistoryEntry => entry !== null);
   } catch (err) {
     console.error(err);
   }
@@ -67,9 +89,9 @@ function subscribeHistoryItems(onStoreChange: () => void) {
   };
 }
 
-function updateStoredHistoryItems(updater: (prev: string[]) => string[]) {
-  const updatedHistory = updater(loadHistoryItems());
-  window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updatedHistory));
+function updateStoredHistoryEntries(updater: (prev: HistoryEntry[]) => HistoryEntry[]) {
+  const updated = updater(loadHistoryEntries());
+  window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updated));
   window.dispatchEvent(new Event(HISTORY_CHANGED_EVENT));
 }
 
@@ -80,7 +102,8 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
   const [error, setError] = useState<string | null>(null);
   const [stepIndex, setStepIndex] = useState<Record<string, number>>({});
   const historySnapshot = useSyncExternalStore(subscribeHistoryItems, getHistorySnapshot, () => "[]");
-  const historyItems = useMemo(() => parseHistoryItems(historySnapshot), [historySnapshot]);
+  const historyEntries = useMemo(() => parseHistoryEntries(historySnapshot), [historySnapshot]);
+  const historyItems = useMemo(() => historyEntries.map((entry) => entry.query), [historyEntries]);
 
   const handleNewChat = useCallback(() => {
     setMessages([]);
@@ -105,7 +128,12 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
       setLoading(true);
       setError(null);
 
-      updateStoredHistoryItems((prev) => [textToSend, ...prev.filter((item) => item !== textToSend)].slice(0, 15));
+      updateStoredHistoryEntries((prev) =>
+        [{ query: textToSend }, ...prev.filter((entry) => entry.query !== textToSend)].slice(
+          0,
+          MAX_HISTORY_ENTRIES,
+        ),
+      );
 
       try {
         const response: ChatResponse = await sendChatMessage(textToSend, endpoint, { lang });
@@ -130,6 +158,12 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
 
         setMessages((prev) => [...prev, aiMessage]);
         setStepIndex((prev) => ({ ...prev, [aiMsgId]: 0 }));
+
+        updateStoredHistoryEntries((prev) =>
+          prev.map((entry) =>
+            entry.query === textToSend ? { ...entry, aiMessage } : entry,
+          ),
+        );
       } catch (err: unknown) {
         const detail = err instanceof Error ? err.message : String(err);
         setError(`${errorMessage} (${detail})`);
@@ -138,6 +172,31 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
       }
     },
     [endpoint, errorMessage, input, lang, loading]
+  );
+
+  const selectHistoryItem = useCallback(
+    (query: string) => {
+      const cached = loadHistoryEntries().find((entry) => entry.query === query);
+
+      if (!cached?.aiMessage) {
+        handleSend(query);
+        return;
+      }
+
+      const userMessage: ChatMessage = {
+        id: createMessageId("u"),
+        role: "user",
+        text: query,
+      };
+
+      const aiMessage = { ...cached.aiMessage, id: createMessageId("ai") };
+
+      setMessages([userMessage, aiMessage]);
+      setStepIndex({ [aiMessage.id]: 0 });
+      setError(null);
+      setInput("");
+    },
+    [handleSend],
   );
 
   const handleStepNavigation = useCallback((msgId: string, delta: number, totalSteps: number) => {
@@ -149,7 +208,7 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
   }, []);
 
   const deleteHistoryItem = useCallback((itemToDelete: string) => {
-    updateStoredHistoryItems((prev) => prev.filter((item) => item !== itemToDelete));
+    updateStoredHistoryEntries((prev) => prev.filter((entry) => entry.query !== itemToDelete));
   }, []);
 
   return {
@@ -163,6 +222,7 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
     clearError: () => setError(null),
     handleNewChat,
     handleSend,
+    selectHistoryItem,
     handleStepNavigation,
     deleteHistoryItem,
   };
