@@ -1,4 +1,5 @@
 import type { Citation, VisualData } from "@/types/chat";
+import { DIAGRAMS } from "@/data/diagrams";
 
 interface AnswerMessageLabels {
   aiName: string;
@@ -204,7 +205,7 @@ export function AnswerMessage({
               {visualData?.figure_id && (
                 <div>
                   <strong>{labels.relatedFigure}: </strong>
-                  {visualData.figure_id}
+                  {DIAGRAMS[visualData.figure_id]?.name || visualData.figure_id}
                 </div>
               )}
               {visualData?.highlight_item && (
