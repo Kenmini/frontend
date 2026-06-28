@@ -168,4 +168,44 @@ test.describe("Frontend MVP manual checklist", () => {
     );
     await saveEvidence(page, "06-backend-adapted-response");
   });
+
+  test("backend pdf_url visual data displays a link to the requested PDF page", async ({ page }) => {
+    await page.route("http://127.0.0.1:9876/ask", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          answer_text: "PDFページ確認テストです。",
+          next_step_hint: null,
+          visual_data: {
+            figure_id: null,
+            highlight_item: null,
+            source: null,
+            page_number: 12,
+            pdf_url: "https://example.com/manuals/hf-2000.pdf",
+          },
+          citations: [],
+          confidence: 0.9,
+          is_gap: false,
+        }),
+      });
+    });
+
+    await page.getByTitle("Settings").click();
+    await page.getByPlaceholder("https://your-api.com/chat").pressSequentially("http://127.0.0.1:9876");
+    await sendMessage(page, "PDFページを見せて");
+
+    await expect(page.getByText("PDFページ確認テストです。")).toBeVisible();
+    const pdfToggle = page.getByRole("button", { name: /hf-2000\.pdf.*Page 12/ });
+    await expect(pdfToggle).toBeVisible();
+
+    await pdfToggle.click();
+    await expect(page.getByText("https://example.com/manuals/hf-2000.pdf")).toBeVisible();
+
+    const pageLink = page.getByRole("link", { name: "Page 12 を開く" });
+    await expect(pageLink).toHaveAttribute("href", "https://example.com/manuals/hf-2000.pdf#page=12");
+    await expect(pageLink).toHaveAttribute("target", "_blank");
+
+    await saveEvidence(page, "07-backend-pdf-url-page-link");
+  });
 });

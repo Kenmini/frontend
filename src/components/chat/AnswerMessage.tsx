@@ -89,6 +89,32 @@ function FormattedAnswerText({ text }: { text: string }) {
   );
 }
 
+function getPdfDisplayLabel(visualData?: VisualData | null) {
+  if (visualData?.pdf_url) {
+    try {
+      const url = new URL(visualData.pdf_url);
+      return url.pathname.split("/").filter(Boolean).pop() || "PDF";
+    } catch {
+      return visualData.pdf_url.split("/").filter(Boolean).pop() || "PDF";
+    }
+  }
+
+  return visualData?.source || "PDF";
+}
+
+function buildPdfPageLinkUrl(visualData?: VisualData | null) {
+  if (!visualData?.pdf_url || visualData.page_number == null) return null;
+
+  try {
+    const url = new URL(visualData.pdf_url);
+    url.hash = `page=${visualData.page_number}`;
+    return url.toString();
+  } catch {
+    const baseUrl = visualData.pdf_url.split("#")[0];
+    return `${baseUrl}#page=${visualData.page_number}`;
+  }
+}
+
 export function AnswerMessage({
   text,
   warnings,
@@ -110,9 +136,10 @@ export function AnswerMessage({
     );
   const confidenceVisible = showConfidence && typeof confidence === "number";
   const hasMetadata = nextStepHint || confidenceVisible || hasVisualData || hasCitations;
-  // Show PDF fallback only when there are no static images but a source+page exists
   const hasStaticImages = (visualData?.static_images?.length ?? 0) > 0;
-  const hasPdfFallback = !hasStaticImages && Boolean(visualData?.source) && Boolean(visualData?.page_number);
+  const pdfPageLinkUrl = buildPdfPageLinkUrl(visualData);
+  const pdfDisplayLabel = getPdfDisplayLabel(visualData);
+  const hasPdfFallback = !hasStaticImages && Boolean(pdfPageLinkUrl);
 
   // Deduplicate citations by source name
   const groupedCitations = hasCitations
@@ -379,34 +406,49 @@ export function AnswerMessage({
               <polyline points="14 2 14 8 20 8" />
             </svg>
             <span style={{ color: "var(--muted)" }}>
-              {visualData?.source || "PDF"} — Page {visualData?.page_number}
+              {pdfDisplayLabel} — Page {visualData?.page_number}
             </span>
           </button>
-          {pdfExpanded && visualData?.source && visualData?.page_number && (
+          {pdfExpanded && pdfPageLinkUrl && visualData?.pdf_url && visualData.page_number != null && (
             <div style={{ padding: "0 14px 14px" }}>
               <div
                 style={{
-                  position: "relative",
-                  width: "100%",
                   border: "1px solid var(--border)",
                   borderRadius: "8px",
-                  overflow: "hidden",
                   backgroundColor: "var(--surface)",
+                  padding: "10px 12px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`${process.env.NEXT_PUBLIC_API_ENDPOINT || ""}/visual/page?source=${encodeURIComponent(visualData.source)}&page=${visualData.page_number}`}
-                  alt={`${visualData.source} page ${visualData.page_number}`}
+                <div
                   style={{
-                    width: "100%",
-                    height: "auto",
-                    display: "block",
+                    fontSize: "11px",
+                    color: "var(--muted)",
+                    lineHeight: 1.5,
+                    wordBreak: "break-all",
                   }}
-                />
+                >
+                  {visualData.pdf_url}
+                </div>
+                <a
+                  href={pdfPageLinkUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    color: "var(--primary)",
+                    fontSize: "12.5px",
+                    fontWeight: 700,
+                    textDecoration: "none",
+                    alignSelf: "flex-start",
+                  }}
+                >
+                  Page {visualData.page_number} を開く
+                </a>
               </div>
               <div style={{ marginTop: "6px", fontSize: "11px", color: "var(--muted)" }}>
-                {visualData.source} — Page {visualData.page_number}
+                {pdfDisplayLabel} — Page {visualData.page_number}
               </div>
             </div>
           )}
