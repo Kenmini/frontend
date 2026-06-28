@@ -36,6 +36,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
+      suppressHydrationWarning
       className={`${ibmPlexSansJP.variable} ${ibmPlexMono.variable}`}
       style={{
         fontFamily: "var(--font-ibm-plex-sans-jp), sans-serif",
