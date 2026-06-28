@@ -138,6 +138,7 @@ export default function Page() {
     handleNewChat,
     handleSend,
     handleStepNavigation,
+    deleteHistoryItem,
   } = useChatController({
     endpoint,
     lang,
@@ -346,53 +347,101 @@ export default function Page() {
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                 {historyItems.map((item, idx) => (
-                  <button
+                  <div
                     key={idx}
-                    onClick={() => {
-                      handleSend(item);
-                      setSidebarOpen(false);
-                    }}
                     style={{
                       display: "flex",
                       alignItems: "center",
                       gap: "8px",
                       width: "100%",
-                      textAlign: "left",
-                      border: "none",
                       backgroundColor: "transparent",
-                      color: "var(--text)",
-                      cursor: "pointer",
-                      padding: "8px",
                       borderRadius: "8px",
-                      fontSize: "12.5px",
-                      lineHeight: 1.3,
                       transition: "background-color 0.2s",
                     }}
                     className="sidebar-item-hover"
                   >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="var(--muted)"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      style={{ flexShrink: 0 }}
-                    >
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                    </svg>
-                    <span
+                    <button
+                      onClick={() => {
+                        handleSend(item);
+                        setSidebarOpen(false);
+                      }}
                       style={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        flex: 1,
+                        minWidth: 0,
+                        textAlign: "left",
+                        border: "none",
+                        backgroundColor: "transparent",
+                        color: "var(--text)",
+                        cursor: "pointer",
+                        padding: "8px 0 8px 8px",
+                        borderRadius: "8px",
+                        fontSize: "12.5px",
+                        lineHeight: 1.3,
                       }}
                     >
-                      {item}
-                    </span>
-                  </button>
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="var(--muted)"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{ flexShrink: 0 }}
+                      >
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                      </svg>
+                      <span
+                        style={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {item}
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => deleteHistoryItem(item)}
+                      title={lang === "ja" ? "履歴から削除" : "Delete from history"}
+                      style={{
+                        width: "28px",
+                        height: "28px",
+                        flexShrink: 0,
+                        border: "none",
+                        backgroundColor: "transparent",
+                        color: "var(--muted)",
+                        cursor: "pointer",
+                        borderRadius: "7px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginRight: "4px",
+                      }}
+                      className="sidebar-item-hover"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M3 6h18" />
+                        <path d="M8 6V4h8v2" />
+                        <path d="M19 6l-1 14H6L5 6" />
+                        <path d="M10 11v5" />
+                        <path d="M14 11v5" />
+                      </svg>
+                    </button>
+                  </div>
                 ))}
               </div>
             )}
