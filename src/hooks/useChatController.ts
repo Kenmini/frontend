@@ -124,6 +124,14 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
     });
   }, []);
 
+  const deleteHistoryItem = useCallback((itemToDelete: string) => {
+    setHistoryItems((prev) => {
+      const updatedHistory = prev.filter((item) => item !== itemToDelete);
+      localStorage.setItem("chat_history", JSON.stringify(updatedHistory));
+      return updatedHistory;
+    });
+  }, []);
+
   return {
     input,
     messages,
@@ -136,5 +144,6 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
     handleNewChat,
     handleSend,
     handleStepNavigation,
+    deleteHistoryItem,
   };
 }
