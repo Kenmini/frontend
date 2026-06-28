@@ -257,9 +257,12 @@ export default function Page() {
   return (
     <div
       style={{
-        height: "100vh",
+        height: "100dvh",
+        minHeight: "100svh",
+        maxHeight: "100dvh",
         width: "100vw",
         display: "flex",
+        overflow: "hidden",
         backgroundColor: "var(--bg)",
         color: "var(--text)",
         fontFamily: "var(--font-ibm-plex-sans-jp), sans-serif",
@@ -715,6 +718,7 @@ export default function Page() {
         style={{
           flex: 1,
           minWidth: 0,
+          minHeight: 0,
           display: "flex",
           flexDirection: "column",
           backgroundColor: "var(--bg)",
