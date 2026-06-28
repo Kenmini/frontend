@@ -23,6 +23,7 @@ export interface Citation {
 export interface VisualData {
   figure_id: string | null;
   highlight_item: string | null;
+  image_url?: string | null;
 }
 
 export interface ChatResponse {
