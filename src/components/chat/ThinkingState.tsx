@@ -53,6 +53,7 @@ export function ThinkingState({ lang, aiName, defaultThinkingLabel }: ThinkingSt
   const [isSpinning, setIsSpinning] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [clickCount, setClickCount] = useState(0);
+  const currentMessage = messages[messageIndex] ?? defaultThinkingLabel;
 
   // Cycle messages every 2.5 seconds
   useEffect(() => {
@@ -261,7 +262,7 @@ export function ThinkingState({ lang, aiName, defaultThinkingLabel }: ThinkingSt
                 animation: "textSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both",
               }}
             >
-              {messages[messageIndex]}
+              {currentMessage}
             </span>
 
             {/* Three blink dots */}

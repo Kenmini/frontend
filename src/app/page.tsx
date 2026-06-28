@@ -40,7 +40,8 @@ const STRINGS = {
     relatedItemLabel: "関連箇所",
     citationsLabel: "出典",
     mockBadge: "デモモード動作中",
-    mockBadgeHint: "APIエンドポイントが未設定のため、デモデータで応答しています。"
+    mockBadgeHint: "APIエンドポイントが未設定のため、デモデータで応答しています。",
+    version: "バージョン"
   },
   en: {
     title: "Lab AI Guide",
@@ -72,9 +73,12 @@ const STRINGS = {
     relatedItemLabel: "Related item",
     citationsLabel: "Citations",
     mockBadge: "Demo Mode Active",
-    mockBadgeHint: "Using built-in demo scenarios because no API endpoint is set."
+    mockBadgeHint: "Using built-in demo scenarios because no API endpoint is set.",
+    version: "Version"
   }
 };
+
+const APP_VERSION = process.env.appVersion ?? "0.0.0";
 
 const EQUIP_SUGGESTIONS = {
   ja: ["共焦点顕微鏡", "レーザー発振器", "分光光度計", "遠心分離機"],
@@ -146,6 +150,8 @@ export default function Page() {
     errorMessage: t.error,
   });
 
+
+
   // Keep the root theme attribute in sync with the current UI setting.
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
@@ -197,7 +203,6 @@ export default function Page() {
       window.removeEventListener("keydown", closeMenu);
     };
   }, [historyMenu]);
-
   // Return empty states before mounting to avoid SSR flash issues
   if (!mounted) return null;
 
@@ -798,6 +803,22 @@ export default function Page() {
             >
               {t.endpointHint}
             </span>
+            <div
+              style={{
+                marginTop: "10px",
+                paddingTop: "10px",
+                borderTop: "1px solid var(--border)",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "11.5px",
+                color: "var(--muted)",
+                fontFamily: "var(--font-ibm-plex-mono), monospace",
+              }}
+            >
+              <span style={{ fontWeight: 600 }}>{t.version}</span>
+              <span>v{APP_VERSION}</span>
+            </div>
           </div>
         )}
 

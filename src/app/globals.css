@@ -190,6 +190,74 @@ textarea {
   color: var(--primary) !important;
 }
 
+.answer-rich-text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.answer-rich-text h2,
+.answer-rich-text h3,
+.answer-rich-text p {
+  margin: 0;
+}
+
+.answer-rich-text h2 {
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.answer-rich-text h3 {
+  font-size: 14.5px;
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.answer-rich-text p {
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.answer-rich-text ol,
+.answer-rich-text ul {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.answer-rich-text li {
+  padding-left: 2px;
+  line-height: 1.55;
+}
+
+.answer-rich-text strong {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.answer-rich-text blockquote {
+  margin: 0;
+  padding: 9px 12px;
+  border-left: 3px solid var(--primary);
+  background: var(--surface);
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.answer-rich-text hr {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2px 0;
+}
+
 /* Responsive Media Queries */
 @media (min-width: 768px) {
   .sidebar-nav {

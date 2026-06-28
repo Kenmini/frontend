@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import { sendChatMessage } from "@/services/chatService";
 import type { ChatMessage, ChatResponse, Step } from "@/types/chat";
 
 type Language = "ja" | "en";
+const HISTORY_STORAGE_KEY = "chat_history";
+const HISTORY_CHANGED_EVENT = "chat_history_changed";
 
 interface UseChatControllerOptions {
   endpoint: string;
@@ -31,9 +33,11 @@ function createMessageId(prefix: string) {
 function loadHistoryItems() {
   if (typeof window === "undefined") return [];
 
-  const savedHistory = localStorage.getItem("chat_history");
-  if (!savedHistory) return [];
+  return parseHistoryItems(window.localStorage.getItem(HISTORY_STORAGE_KEY));
+}
 
+function parseHistoryItems(savedHistory: string | null) {
+  if (!savedHistory) return [];
   try {
     const parsedHistory = JSON.parse(savedHistory);
     if (Array.isArray(parsedHistory)) {
@@ -46,13 +50,37 @@ function loadHistoryItems() {
   return [];
 }
 
+function getHistorySnapshot() {
+  if (typeof window === "undefined") return "[]";
+  return window.localStorage.getItem(HISTORY_STORAGE_KEY) ?? "[]";
+}
+
+function subscribeHistoryItems(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener(HISTORY_CHANGED_EVENT, onStoreChange);
+
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener(HISTORY_CHANGED_EVENT, onStoreChange);
+  };
+}
+
+function updateStoredHistoryItems(updater: (prev: string[]) => string[]) {
+  const updatedHistory = updater(loadHistoryItems());
+  window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updatedHistory));
+  window.dispatchEvent(new Event(HISTORY_CHANGED_EVENT));
+}
+
 export function useChatController({ endpoint, lang, errorMessage }: UseChatControllerOptions) {
   const [input, setInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [stepIndex, setStepIndex] = useState<Record<string, number>>({});
-  const [historyItems, setHistoryItems] = useState<string[]>(loadHistoryItems);
+  const historySnapshot = useSyncExternalStore(subscribeHistoryItems, getHistorySnapshot, () => "[]");
+  const historyItems = useMemo(() => parseHistoryItems(historySnapshot), [historySnapshot]);
 
   const handleNewChat = useCallback(() => {
     setMessages([]);
@@ -77,11 +105,7 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
       setLoading(true);
       setError(null);
 
-      setHistoryItems((prev) => {
-        const updatedHistory = [textToSend, ...prev.filter((item) => item !== textToSend)].slice(0, 15);
-        localStorage.setItem("chat_history", JSON.stringify(updatedHistory));
-        return updatedHistory;
-      });
+      updateStoredHistoryItems((prev) => [textToSend, ...prev.filter((item) => item !== textToSend)].slice(0, 15));
 
       try {
         const response: ChatResponse = await sendChatMessage(textToSend, endpoint, { lang });
@@ -125,11 +149,7 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
   }, []);
 
   const deleteHistoryItem = useCallback((itemToDelete: string) => {
-    setHistoryItems((prev) => {
-      const updatedHistory = prev.filter((item) => item !== itemToDelete);
-      localStorage.setItem("chat_history", JSON.stringify(updatedHistory));
-      return updatedHistory;
-    });
+    updateStoredHistoryItems((prev) => prev.filter((item) => item !== itemToDelete));
   }, []);
 
   return {

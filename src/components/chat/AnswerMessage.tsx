@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
 import type { Citation, VisualData } from "@/types/chat";
 import { DIAGRAMS } from "@/data/diagrams";
+import { parseAnswerBlocks, parseAnswerInline } from "@/utils/answerParser";
 
 interface AnswerMessageLabels {
   aiName: string;
@@ -21,6 +23,67 @@ interface AnswerMessageProps {
   confidence?: number;
   visualData?: VisualData | null;
   labels: AnswerMessageLabels;
+}
+
+function renderInlineText(text: string): ReactNode {
+  return parseAnswerInline(text).map((segment, index) => {
+    if (segment.type === "strong") {
+      return <strong key={index}>{segment.text}</strong>;
+    }
+
+    return <span key={index}>{segment.text}</span>;
+  });
+}
+
+function FormattedAnswerText({ text }: { text: string }) {
+  const blocks = parseAnswerBlocks(text);
+
+  return (
+    <div className="answer-rich-text">
+      {blocks.map((block, index) => {
+        if (block.type === "rule") {
+          return <hr key={index} />;
+        }
+
+        if (block.type === "heading") {
+          const Tag = block.level === 1 ? "h2" : "h3";
+          return <Tag key={index}>{renderInlineText(block.text)}</Tag>;
+        }
+
+        if (block.type === "orderedList") {
+          return (
+            <ol key={index}>
+              {block.items.map((item, itemIndex) => (
+                <li key={itemIndex}>{renderInlineText(item)}</li>
+              ))}
+            </ol>
+          );
+        }
+
+        if (block.type === "unorderedList") {
+          return (
+            <ul key={index}>
+              {block.items.map((item, itemIndex) => (
+                <li key={itemIndex}>{renderInlineText(item)}</li>
+              ))}
+            </ul>
+          );
+        }
+
+        if (block.type === "quote") {
+          return (
+            <blockquote key={index}>
+              {block.lines.map((line, lineIndex) => (
+                <p key={lineIndex}>{renderInlineText(line)}</p>
+              ))}
+            </blockquote>
+          );
+        }
+
+        return <p key={index}>{renderInlineText(block.text)}</p>;
+      })}
+    </div>
+  );
 }
 
 export function AnswerMessage({
@@ -86,7 +149,7 @@ export function AnswerMessage({
           maxWidth: "90%",
         }}
       >
-        {text}
+        <FormattedAnswerText text={text} />
       </div>
 
       {warnings && (
