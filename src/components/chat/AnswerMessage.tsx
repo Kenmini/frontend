@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import React, { useState } from "react";
 import type { Citation, VisualData } from "@/types/chat";
 import { DIAGRAMS } from "@/data/diagrams";
 import { parseAnswerBlocks, parseAnswerInline } from "@/utils/answerParser";
@@ -96,9 +97,13 @@ export function AnswerMessage({
   visualData,
   labels,
 }: AnswerMessageProps) {
+  const [pdfExpanded, setPdfExpanded] = useState(false);
   const hasCitations = citations && citations.length > 0;
   const hasVisualData = Boolean(visualData?.figure_id || visualData?.highlight_item);
   const hasMetadata = nextStepHint || typeof confidence === "number" || hasVisualData || hasCitations;
+  // Show PDF fallback only when there are no static images but a pdf_url exists
+  const hasStaticImages = (visualData?.static_images?.length ?? 0) > 0;
+  const hasPdfFallback = !hasStaticImages && Boolean(visualData?.pdf_url) && Boolean(visualData?.page_number);
 
   return (
     <>
@@ -290,6 +295,96 @@ export function AnswerMessage({
                   </li>
                 ))}
               </ul>
+            </div>
+          )}
+        </div>
+      )}
+
+      {hasPdfFallback && (
+        <div
+          style={{
+            border: "1px solid var(--border)",
+            backgroundColor: "var(--surface2)",
+            borderRadius: "12px",
+            maxWidth: "90%",
+            overflow: "hidden",
+          }}
+        >
+          <button
+            onClick={() => setPdfExpanded(!pdfExpanded)}
+            style={{
+              width: "100%",
+              border: "none",
+              backgroundColor: "transparent",
+              color: "var(--text)",
+              cursor: "pointer",
+              padding: "10px 14px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "12.5px",
+              fontWeight: 600,
+            }}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{
+                transform: pdfExpanded ? "rotate(90deg)" : "rotate(0deg)",
+                transition: "transform 0.2s ease",
+              }}
+            >
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--muted)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            <span style={{ color: "var(--muted)" }}>
+              {visualData?.source || "PDF"} — Page {visualData?.page_number}
+            </span>
+          </button>
+          {pdfExpanded && visualData?.pdf_url && (
+            <div style={{ padding: "0 14px 14px" }}>
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  border: "1px solid var(--border)",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  backgroundColor: "var(--surface)",
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <iframe
+                  src={`${visualData.pdf_url}#page=${visualData.page_number}`}
+                  title={`${visualData.source || "PDF"} page ${visualData.page_number}`}
+                  style={{
+                    width: "100%",
+                    height: "500px",
+                    border: "none",
+                  }}
+                />
+              </div>
+              <div style={{ marginTop: "6px", fontSize: "11px", color: "var(--muted)" }}>
+                {visualData.source} — Page {visualData.page_number}
+              </div>
             </div>
           )}
         </div>

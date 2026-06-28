@@ -1,10 +1,19 @@
-import type { ChatRequestOptions, ChatResponse, Citation, VisualData, Step } from "@/types/chat";
+import type { ChatRequestOptions, ChatResponse, Citation, StaticImage, VisualData, Step } from "@/types/chat";
 import { DIAGRAMS } from "@/data/diagrams";
 
 interface AskResponse {
   answer_text: string;
   next_step_hint?: string | null;
-  visual_data: VisualData | null;
+  visual_data: {
+    figure_id: string | null;
+    highlight_item: string | null;
+    image_url?: string | null;
+    source?: string | null;
+    page_number?: number | null;
+    caption?: string | null;
+    static_images?: StaticImage[];
+    pdf_url?: string | null;
+  } | null;
   citations: Citation[];
   confidence: number;
   is_gap: boolean;
@@ -64,30 +73,60 @@ function isAskResponse(value: unknown): value is AskResponse {
 
 function adaptAskResponse(data: AskResponse, lang?: "ja" | "en"): ChatResponse {
   const steps: Step[] = [];
-  let resolvedVisualData = null;
+  let resolvedVisualData: VisualData | null = null;
 
-  if (data.visual_data && data.visual_data.figure_id) {
-    const figId = data.visual_data.figure_id;
-    const item = data.visual_data.highlight_item;
-    const diagram = DIAGRAMS[figId];
+  if (data.visual_data) {
+    const vd = data.visual_data;
 
-    if (diagram) {
-      resolvedVisualData = {
-        figure_id: figId,
-        highlight_item: item,
-      };
+    // Build VisualData for the response (always pass through)
+    resolvedVisualData = {
+      figure_id: vd.figure_id,
+      highlight_item: vd.highlight_item,
+      image_url: vd.image_url || null,
+      source: vd.source || null,
+      page_number: vd.page_number || null,
+      caption: vd.caption || null,
+      static_images: vd.static_images || [],
+      pdf_url: vd.pdf_url || null,
+    };
 
-      const highlight = item ? diagram.highlights[item] : null;
+    // Priority 1: Static images from S3 → create steps from them
+    if (vd.static_images && vd.static_images.length > 0) {
+      for (const img of vd.static_images) {
+        // For each static image, find the most relevant highlight
+        const highlightKeys = Object.keys(img.highlights || {});
+        const firstHighlight = highlightKeys.length > 0 ? img.highlights[highlightKeys[0]] : null;
 
-      steps.push({
-        id: `${figId}-resolved-step`,
-        title: diagram.name,
-        text: highlight?.description || (item ? `${item}の位置を確認してください。` : "図面を確認してください。"),
-        imageUrl: diagram.url,
-        annotation: highlight?.annotation,
-        annotationLabel: highlight?.item,
-        annotationDescription: highlight?.description,
-      });
+        steps.push({
+          id: `static-${img.filename}`,
+          title: img.name,
+          text: img.description,
+          imageUrl: img.image_url,
+          annotation: firstHighlight?.annotation,
+          annotationLabel: firstHighlight?.item,
+          annotationDescription: firstHighlight?.explanation,
+        });
+      }
+    }
+    // Priority 2: DIAGRAMS-based figure/highlight (existing behavior)
+    else if (vd.figure_id) {
+      const figId = vd.figure_id;
+      const item = vd.highlight_item;
+      const diagram = DIAGRAMS[figId];
+
+      if (diagram) {
+        const highlight = item ? diagram.highlights[item] : null;
+
+        steps.push({
+          id: `${figId}-resolved-step`,
+          title: diagram.name,
+          text: highlight?.description || (item ? `${item}の位置を確認してください。` : "図面を確認してください。"),
+          imageUrl: diagram.url,
+          annotation: highlight?.annotation,
+          annotationLabel: highlight?.item,
+          annotationDescription: highlight?.description,
+        });
+      }
     }
   }
 

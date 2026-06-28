@@ -24,9 +24,28 @@ export interface Citation {
   snippet: string;
 }
 
+export interface StaticImage {
+  image_url: string;
+  filename: string;
+  name: string;
+  description: string;
+  page_number: number;
+  highlights: Record<string, {
+    item: string;
+    annotation?: Annotation;
+    explanation?: string;
+  }>;
+}
+
 export interface VisualData {
   figure_id: string | null;
   highlight_item: string | null;
+  image_url?: string | null;
+  source?: string | null;
+  page_number?: number | null;
+  caption?: string | null;
+  static_images?: StaticImage[];
+  pdf_url?: string | null;
 }
 
 export interface ChatResponse {
