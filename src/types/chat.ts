@@ -44,6 +44,7 @@ export interface ChatResponse {
 export interface ChatRequestOptions {
   sessionId?: string;
   activeFigureId?: string;
+  lang?: "ja" | "en";
 }
 
 export interface ChatMessage {

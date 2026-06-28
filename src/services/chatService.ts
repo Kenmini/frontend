@@ -62,7 +62,7 @@ function isAskResponse(value: unknown): value is AskResponse {
   );
 }
 
-function adaptAskResponse(data: AskResponse): ChatResponse {
+function adaptAskResponse(data: AskResponse, lang?: "ja" | "en"): ChatResponse {
   const steps: Step[] = [];
   let resolvedVisualData = null;
 
@@ -91,10 +91,14 @@ function adaptAskResponse(data: AskResponse): ChatResponse {
     }
   }
 
+  const gapWarning = lang === "en"
+    ? "No answer was found in the materials. This question has been recorded for professor review."
+    : "資料に回答が見つからなかったため、この質問は先生確認用に記録されました。";
+
   return {
     answer: data.answer_text,
     steps,
-    warnings: data.is_gap ? "資料に回答が見つからなかったため、この質問は先生確認用に記録されました。" : undefined,
+    warnings: data.is_gap ? gapWarning : undefined,
     nextStepHint: data.next_step_hint,
     citations: data.citations,
     confidence: data.confidence,
@@ -431,6 +435,7 @@ export async function sendChatMessage(
         message,
         session_id: options.sessionId ?? getSessionId(),
         current_state: { active_figure_id: options.activeFigureId ?? DEFAULT_FIGURE_ID },
+        lang: options.lang || null,
       }),
       signal: controller.signal,
     });
@@ -443,7 +448,7 @@ export async function sendChatMessage(
     if (!isAskResponse(data)) {
       throw new Error("Invalid API response shape");
     }
-    return adaptAskResponse(data);
+    return adaptAskResponse(data, options.lang);
   } catch (error: unknown) {
     console.error("Backend API connection failed:", error);
     if (error instanceof DOMException && error.name === "AbortError") {

@@ -84,7 +84,7 @@ export function useChatController({ endpoint, lang, errorMessage }: UseChatContr
       });
 
       try {
-        const response: ChatResponse = await sendChatMessage(textToSend, endpoint);
+        const response: ChatResponse = await sendChatMessage(textToSend, endpoint, { lang });
         const aiMsgId = createMessageId("ai");
         const steps: Step[] = response.steps.map((step, idx) => ({
           ...step,

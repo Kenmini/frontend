@@ -151,6 +151,11 @@ export default function Page() {
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   }, [dark]);
 
+  // Keep the html lang attribute in sync with the current language.
+  useEffect(() => {
+    document.documentElement.setAttribute("lang", lang);
+  }, [lang]);
+
   // Update theme helper
   const handleToggleDark = () => {
     const nextDark = !dark;
