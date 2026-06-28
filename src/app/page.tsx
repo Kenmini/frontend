@@ -93,8 +93,18 @@ const EQUIP_SUGGESTIONS = {
 };
 
 const CHAT_SUGGESTIONS = {
-  ja: ["高圧印加時にエラーが出ます", "収束レンズの非点補正の手順を教えてください", "試料ホルダーの挿入方法がわかりません"],
-  en: ["I get an error during high-voltage application", "How do I perform condenser lens astigmatism correction?", "I don't understand how to insert the sample holder"]
+  ja: [
+    "試料ホルダーの入れ方を教えてください",
+    "高圧の印加とフラッシングの手順を教えてください",
+    "研究室の場所はどこですか？",
+    "試料ホルダーを安全に取り出す方法は？"
+  ],
+  en: [
+    "How do I insert the sample holder?",
+    "How do I apply the high voltage and perform flashing?",
+    "Where is the lab located?",
+    "How do I safely remove the sample holder?"
+  ]
 };
 
 const subscribeToHydration = () => () => {};
