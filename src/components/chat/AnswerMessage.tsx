@@ -22,6 +22,8 @@ interface AnswerMessageProps {
   citations?: Citation[];
   confidence?: number;
   visualData?: VisualData | null;
+  showConfidence?: boolean;
+  showRelatedFigure?: boolean;
   labels: AnswerMessageLabels;
 }
 
@@ -94,11 +96,15 @@ export function AnswerMessage({
   citations,
   confidence,
   visualData,
+  showConfidence = false,
+  showRelatedFigure = false,
   labels,
 }: AnswerMessageProps) {
   const hasCitations = citations && citations.length > 0;
-  const hasVisualData = Boolean(visualData?.figure_id || visualData?.highlight_item);
-  const hasMetadata = nextStepHint || typeof confidence === "number" || hasVisualData || hasCitations;
+  const hasVisualData =
+    showRelatedFigure && Boolean(visualData?.figure_id || visualData?.highlight_item);
+  const confidenceVisible = showConfidence && typeof confidence === "number";
+  const hasMetadata = nextStepHint || confidenceVisible || hasVisualData || hasCitations;
 
   return (
     <>
@@ -251,10 +257,10 @@ export function AnswerMessage({
             lineHeight: 1.45,
           }}
         >
-          {typeof confidence === "number" && (
+          {confidenceVisible && (
             <div>
               <strong>{labels.confidence}: </strong>
-              {Math.round(confidence * 100)}%
+              {Math.round(confidence! * 100)}%
             </div>
           )}
           {nextStepHint && (

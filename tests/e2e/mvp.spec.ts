@@ -141,6 +141,7 @@ test.describe("Frontend MVP manual checklist", () => {
 
     await page.getByTitle("Settings").click();
     await page.getByPlaceholder("https://your-api.com/chat").pressSequentially("http://127.0.0.1:9876");
+    await page.getByLabel("関連図を表示").check();
     await sendMessage(page, "輝度つまみはどこですか？");
     await expect(page.getByPlaceholder(/装置の症状を入力/)).toBeDisabled();
     await expect(page.getByText("確認手順を組み立てています...")).toBeVisible();

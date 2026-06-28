@@ -41,7 +41,10 @@ const STRINGS = {
     citationsLabel: "出典",
     mockBadge: "デモモード動作中",
     mockBadgeHint: "APIエンドポイントが未設定のため、デモデータで応答しています。",
-    version: "バージョン"
+    version: "バージョン",
+    displayLabel: "表示項目",
+    showConfidence: "信頼度を表示",
+    showRelatedFigure: "関連図を表示"
   },
   en: {
     title: "Lab AI Guide",
@@ -74,7 +77,10 @@ const STRINGS = {
     citationsLabel: "Citations",
     mockBadge: "Demo Mode Active",
     mockBadgeHint: "Using built-in demo scenarios because no API endpoint is set.",
-    version: "Version"
+    version: "Version",
+    displayLabel: "Display options",
+    showConfidence: "Show confidence",
+    showRelatedFigure: "Show related figure"
   }
 };
 
@@ -114,6 +120,18 @@ function getInitialEndpoint() {
   return localStorage.getItem("api_endpoint") || "";
 }
 
+function getInitialShowConfidence() {
+  if (typeof window === "undefined") return false;
+
+  return localStorage.getItem("show_confidence") === "true";
+}
+
+function getInitialShowRelatedFigure() {
+  if (typeof window === "undefined") return false;
+
+  return localStorage.getItem("show_related_figure") === "true";
+}
+
 export default function Page() {
   const mounted = useSyncExternalStore(
     subscribeToHydration,
@@ -124,6 +142,8 @@ export default function Page() {
   const [dark, setDark] = useState<boolean>(getInitialDark);
   const [endpoint, setEndpoint] = useState<string>(getInitialEndpoint);
   const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [showConfidence, setShowConfidence] = useState<boolean>(getInitialShowConfidence);
+  const [showRelatedFigure, setShowRelatedFigure] = useState<boolean>(getInitialShowRelatedFigure);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [historyMenu, setHistoryMenu] = useState<{ item: string; x: number; y: number } | null>(null);
 
@@ -142,6 +162,7 @@ export default function Page() {
     clearError,
     handleNewChat,
     handleSend,
+    selectHistoryItem,
     handleStepNavigation,
     deleteHistoryItem,
   } = useChatController({
@@ -149,7 +170,6 @@ export default function Page() {
     lang,
     errorMessage: t.error,
   });
-
 
 
   // Keep the root theme attribute in sync with the current UI setting.
@@ -182,6 +202,18 @@ export default function Page() {
     const val = e.target.value;
     setEndpoint(val);
     localStorage.setItem("api_endpoint", val);
+  };
+
+  const handleToggleShowConfidence = () => {
+    const next = !showConfidence;
+    setShowConfidence(next);
+    localStorage.setItem("show_confidence", String(next));
+  };
+
+  const handleToggleShowRelatedFigure = () => {
+    const next = !showRelatedFigure;
+    setShowRelatedFigure(next);
+    localStorage.setItem("show_related_figure", String(next));
   };
 
   // Auto-scroll when loading state changes or messages are added
@@ -448,7 +480,7 @@ export default function Page() {
                   >
                     <button
                       onClick={() => {
-                        handleSend(item);
+                        selectHistoryItem(item);
                         setSidebarOpen(false);
                       }}
                       style={{
@@ -809,6 +841,64 @@ export default function Page() {
                 paddingTop: "10px",
                 borderTop: "1px solid var(--border)",
                 display: "flex",
+                flexDirection: "column",
+                gap: "8px",
+              }}
+            >
+              <label
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "var(--text)",
+                }}
+              >
+                {t.displayLabel}
+              </label>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  fontSize: "12.5px",
+                  color: "var(--text)",
+                  cursor: "pointer",
+                  userSelect: "none",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={showConfidence}
+                  onChange={handleToggleShowConfidence}
+                  style={{ cursor: "pointer" }}
+                />
+                {t.showConfidence}
+              </label>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  fontSize: "12.5px",
+                  color: "var(--text)",
+                  cursor: "pointer",
+                  userSelect: "none",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={showRelatedFigure}
+                  onChange={handleToggleShowRelatedFigure}
+                  style={{ cursor: "pointer" }}
+                />
+                {t.showRelatedFigure}
+              </label>
+            </div>
+            <div
+              style={{
+                marginTop: "10px",
+                paddingTop: "10px",
+                borderTop: "1px solid var(--border)",
+                display: "flex",
                 alignItems: "center",
                 gap: "8px",
                 fontSize: "11.5px",
@@ -830,6 +920,8 @@ export default function Page() {
           stepIndex={stepIndex}
           dark={dark}
           lang={lang}
+          showConfidence={showConfidence}
+          showRelatedFigure={showRelatedFigure}
           labels={{
             emptyTitle: t.emptyTitle,
             empty: t.empty,
