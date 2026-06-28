@@ -92,8 +92,8 @@ const EQUIP_SUGGESTIONS = {
 };
 
 const CHAT_SUGGESTIONS = {
-  ja: ["レーザーが出ません", "電源が入らない", "ピントが合わない"],
-  en: ["The laser will not emit", "It will not power on", "Can't get it in focus"]
+  ja: ["高圧印加時にエラーが出ます", "収束レンズの非点補正の手順を教えてください", "試料ホルダーの挿入方法がわかりません"],
+  en: ["I get an error during high-voltage application", "How do I perform condenser lens astigmatism correction?", "I don't understand how to insert the sample holder"]
 };
 
 const subscribeToHydration = () => () => {};

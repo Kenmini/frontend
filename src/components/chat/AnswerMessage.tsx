@@ -104,12 +104,26 @@ export function AnswerMessage({
   const [pdfExpanded, setPdfExpanded] = useState(false);
   const hasCitations = citations && citations.length > 0;
   const hasVisualData =
-    showRelatedFigure && Boolean(visualData?.figure_id || visualData?.highlight_item);
+    showRelatedFigure && Boolean(
+      (visualData?.figure_id && visualData.figure_id !== "panel_01") ||
+      visualData?.highlight_item
+    );
   const confidenceVisible = showConfidence && typeof confidence === "number";
   const hasMetadata = nextStepHint || confidenceVisible || hasVisualData || hasCitations;
-  // Show PDF fallback only when there are no static images but a pdf_url exists
+  // Show PDF fallback only when there are no static images but a source+page exists
   const hasStaticImages = (visualData?.static_images?.length ?? 0) > 0;
-  const hasPdfFallback = !hasStaticImages && Boolean(visualData?.pdf_url) && Boolean(visualData?.page_number);
+  const hasPdfFallback = !hasStaticImages && Boolean(visualData?.source) && Boolean(visualData?.page_number);
+
+  // Deduplicate citations by source name
+  const groupedCitations = hasCitations
+    ? Object.entries(
+        citations.reduce<Record<string, string[]>>((acc, c) => {
+          if (!acc[c.source]) acc[c.source] = [];
+          acc[c.source].push(c.snippet);
+          return acc;
+        }, {})
+      )
+    : [];
 
   return (
     <>
@@ -294,10 +308,13 @@ export function AnswerMessage({
             <div>
               <strong>{labels.citations}</strong>
               <ul style={{ margin: "6px 0 0", paddingLeft: "16px" }}>
-                {citations.map((citation, index) => (
-                  <li key={`${citation.source}-${index}`} style={{ marginBottom: "6px" }}>
-                    <div style={{ fontWeight: 600 }}>{citation.source}</div>
-                    <div style={{ color: "var(--muted)" }}>{citation.snippet}</div>
+                {groupedCitations.map(([source, snippets]) => (
+                  <li key={source} style={{ marginBottom: "8px" }}>
+                    <div style={{ fontWeight: 600 }}>{source}</div>
+                    <div style={{ color: "var(--muted)", fontSize: "12px", marginTop: "2px" }}>
+                      {snippets[0].slice(0, 120)}
+                      {snippets[0].length > 120 ? "…" : ""}
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -365,7 +382,7 @@ export function AnswerMessage({
               {visualData?.source || "PDF"} — Page {visualData?.page_number}
             </span>
           </button>
-          {pdfExpanded && visualData?.pdf_url && (
+          {pdfExpanded && visualData?.source && visualData?.page_number && (
             <div style={{ padding: "0 14px 14px" }}>
               <div
                 style={{
@@ -378,13 +395,13 @@ export function AnswerMessage({
                 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <iframe
-                  src={`${visualData.pdf_url}#page=${visualData.page_number}`}
-                  title={`${visualData.source || "PDF"} page ${visualData.page_number}`}
+                <img
+                  src={`${process.env.NEXT_PUBLIC_API_ENDPOINT || ""}/visual/page?source=${encodeURIComponent(visualData.source)}&page=${visualData.page_number}`}
+                  alt={`${visualData.source} page ${visualData.page_number}`}
                   style={{
                     width: "100%",
-                    height: "500px",
-                    border: "none",
+                    height: "auto",
+                    display: "block",
                   }}
                 />
               </div>
