@@ -179,3 +179,74 @@ textarea {
     display: block !important;
   }
 }
+
+/* AI Thinking/Loading Animations */
+@keyframes logoBob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes logoSpinOnDemand {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-15deg) scale(1.15);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(10px) scale(0.5);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.2);
+  }
+  100% {
+    transform: translateY(-70px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes textSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scannerSlide {
+  0% {
+    left: -30%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.interactive-loader-logo:hover {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 8px var(--primary)) !important;
+}
