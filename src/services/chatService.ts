@@ -69,23 +69,9 @@ function adaptAskResponse(data: AskResponse): ChatResponse {
   if (data.visual_data && data.visual_data.figure_id) {
     const figId = data.visual_data.figure_id;
     const item = data.visual_data.highlight_item;
-    const imageUrl = data.visual_data.image_url;
     const diagram = DIAGRAMS[figId];
 
-    if (imageUrl) {
-      resolvedVisualData = {
-        figure_id: figId,
-        highlight_item: item,
-        image_url: imageUrl,
-      };
-
-      steps.push({
-        id: `${figId}-resolved-step`,
-        title: `図表: ${figId}`,
-        text: item ? `${item}の位置を確認してください。` : "図面を確認してください。",
-        imageUrl: imageUrl,
-      });
-    } else if (diagram) {
+    if (diagram) {
       resolvedVisualData = {
         figure_id: figId,
         highlight_item: item,
