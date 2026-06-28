@@ -4,6 +4,7 @@ import React from "react";
 import { StepCard } from "@/components/steps/StepCard";
 import type { ChatMessage } from "@/types/chat";
 import { AnswerMessage } from "./AnswerMessage";
+import { ThinkingState } from "./ThinkingState";
 
 interface ChatHistoryLabels {
   emptyTitle: string;
@@ -242,26 +243,11 @@ export function ChatHistory({
         })}
 
         {loading && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", animation: "msgIn .3s ease both" }}>
-            <AiHeader label={labels.aiName} />
-            <div style={{ backgroundColor: "var(--ai-bg)", padding: "14px 18px", borderRadius: "4px 16px 16px 16px", display: "flex", alignItems: "center", gap: "10px", width: "fit-content" }}>
-              <span style={{ display: "flex", gap: "5px" }}>
-                {[0, 0.2, 0.4].map((delay) => (
-                  <span
-                    key={delay}
-                    style={{
-                      width: "7px",
-                      height: "7px",
-                      borderRadius: "50%",
-                      backgroundColor: "var(--muted)",
-                      animation: `blink 1.2s infinite ${delay}s`,
-                    }}
-                  />
-                ))}
-              </span>
-              <span style={{ fontSize: "12.5px", color: "var(--muted)" }}>{labels.thinking}</span>
-            </div>
-          </div>
+          <ThinkingState
+            lang={lang}
+            aiName={labels.aiName}
+            defaultThinkingLabel={labels.thinking}
+          />
         )}
 
         {error && (
