@@ -19,7 +19,7 @@ const STRINGS = {
     newChat: "新規相談",
     history: "履歴",
     historyEmpty: "まだ相談はありません。",
-    equipment: "装置から探す",
+    equipment: "研究室ガイド",
     cardView: "手順カード",
     emptyTitle: "どうされましたか？",
     empty: "装置の不具合や操作方法を質問してください。確認手順を画像付きで順番にご案内します。",
@@ -55,7 +55,7 @@ const STRINGS = {
     newChat: "New Chat",
     history: "History",
     historyEmpty: "No consultations yet.",
-    equipment: "Browse by device",
+    equipment: "Lab Guide",
     cardView: "Step Card",
     emptyTitle: "How can I help?",
     empty: "Ask about an equipment fault or how to operate a device. I will walk you through the checks step by step, with images.",
@@ -88,8 +88,8 @@ const STRINGS = {
 const APP_VERSION = process.env.appVersion ?? "0.0.0";
 
 const EQUIP_SUGGESTIONS = {
-  ja: ["共焦点顕微鏡", "レーザー発振器", "分光光度計", "遠心分離機"],
-  en: ["Confocal microscope", "Laser source", "Spectrophotometer", "Centrifuge"]
+  ja: ["透過電子顕微鏡", "研究室の場所"],
+  en: ["Transmission electron microscope", "Lab location"]
 };
 
 const CHAT_SUGGESTIONS = {
@@ -187,7 +187,8 @@ export default function Page() {
   // Bypass boot screen in test automation environments to avoid delaying test suites.
   useEffect(() => {
     if (typeof navigator !== "undefined" && navigator.webdriver) {
-      setBooting(false);
+      const timerId = window.setTimeout(() => setBooting(false), 0);
+      return () => window.clearTimeout(timerId);
     }
   }, []);
 
