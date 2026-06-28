@@ -18,7 +18,7 @@ export const FORCE_MOCK_MODE = process.env.NEXT_PUBLIC_USE_MOCK === "true";
 
 // Default backend API endpoint from environment variables (wired at build/runtime time).
 export const DEFAULT_API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT || "";
-const REQUEST_TIMEOUT_MS = 15000;
+const REQUEST_TIMEOUT_MS = 45000;
 const DEFAULT_FIGURE_ID = "panel_01";
 let cachedSessionId: string | null = null;
 
