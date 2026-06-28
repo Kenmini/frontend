@@ -16,15 +16,11 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          # フロントエンドのパスや再起動コマンドは環境に合わせて書き換えてください
           script: |
-            cd /path/to/frontend
+            cd /home/ec2-user/frontend
             git pull origin main
             
-            # ビルド等が必要な場合はコメントアウトを外してください
-            # npm install
-            # npm run build
+            npm install
+            npm run build
             
-            # 再起動コマンド
-            # 例: pm2 restart frontend
-            # 例: sudo systemctl restart frontend
+            sudo systemctl restart ump-frontend.service
