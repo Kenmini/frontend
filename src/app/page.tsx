@@ -94,16 +94,16 @@ const EQUIP_SUGGESTIONS = {
 
 const CHAT_SUGGESTIONS = {
   ja: [
-    "試料ホルダーの入れ方を教えてください",
-    "高圧の印加とフラッシングの手順を教えてください",
     "研究室の場所はどこですか？",
-    "試料ホルダーを安全に取り出す方法は？"
+    "高圧の印加とフラッシングの手順を教えてください",
+    "試料ホルダーの安全な取り出し方を教えてください",
+    "対物レンズの非点収差を補正する方法を教えてください"
   ],
   en: [
-    "How do I insert the sample holder?",
-    "How do I apply the high voltage and perform flashing?",
     "Where is the lab located?",
-    "How do I safely remove the sample holder?"
+    "How do I apply the high voltage and perform flashing?",
+    "How do I safely remove the sample holder?",
+    "How do I correct objective lens astigmatism?"
   ]
 };
 
