@@ -34,8 +34,9 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function Ch
     }
   };
 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter" && !event.shiftKey) {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const isComposing = event.nativeEvent.isComposing || event.keyCode === 229;
+    if (event.key === "Enter" && !event.shiftKey && !isComposing) {
       event.preventDefault();
       onSubmit();
     }
@@ -69,7 +70,7 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function Ch
           ref={textareaRef}
           value={value}
           onChange={handleInputChange}
-          onKeyDown={handleKeyPress}
+          onKeyDown={handleKeyDown}
           rows={1}
           placeholder={placeholder}
           style={{
