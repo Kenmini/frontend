@@ -54,17 +54,19 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function Ch
         borderTop: "1px solid var(--border)",
         backgroundColor: "var(--surface)",
       }}
+      className="chat-input-shell"
     >
       <form
         onSubmit={handleSubmit}
         style={{
           maxWidth: "760px",
           margin: "0 auto",
-          padding: "14px 24px",
+          padding: "14px 24px calc(14px + env(safe-area-inset-bottom))",
           display: "flex",
           alignItems: "flex-end",
           gap: "10px",
         }}
+        className="chat-input-form"
       >
         <textarea
           ref={textareaRef}
